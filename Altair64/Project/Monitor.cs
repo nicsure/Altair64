@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Printing;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -71,13 +72,14 @@ namespace Altair64.Project
             for (int i = 0; i < 15; i++)
             {
                 dataBox[i] = new NumberBox[16];
-                int y = (i * 35) + 50;
-                NumberBox ab = new();
-                ab.Top = y;
-                ab.Left = 10;
-                ab.Width = 60;
-                ab.Value = 0xffff;
-                ab.Font = Bold.Font;
+                NumberBox ab = new()
+                {
+                    Anchor = AnchorStyles.Left | AnchorStyles.Right,
+                    Margin = new(0),
+                    TextAlign = HorizontalAlignment.Center,
+                    Value = 0xffff,
+                    Font = Bold.Font
+                };
                 ab.TextAlign = HorizontalAlignment.Center;
                 if (i == 7)
                 {
@@ -89,49 +91,28 @@ namespace Altair64.Project
                     ab.BorderStyle = BorderStyle.None;
                 }
                 addrBox[i] = ab;
-                Controls.Add(ab);
+                MemView.Controls.Add(ab, 0, i+1);
             }
-
             for (int x = 0; x < 16; x++)
             {
-                NumberBox nb = new();
-                nb.Top = 16;
-                nb.Left = 80 + x * 39;
-                nb.Width = 40;
-                nb.Value = x;
-                nb.Font = Bold.Font;
-                nb.BorderStyle = BorderStyle.None;
-                nb.ReadOnly = true;
-                nb.Digits = 1;
-                nb.Maximum = 0xf;
-                nb.TextAlign = HorizontalAlignment.Center;
-                Controls.Add(nb);
-            }
-
-            for (int x = 0; x < 16; x++)
-            {
-                for (int i = 0; i < 15; i++)
+                for (int y = 0; y < 15; y++)
                 {
-                    int y = (i * 35) + 50;
-                    NumberBox nb = new();
-                    nb.Top = y;
-                    nb.Left = 80 + x * 39;
-                    nb.Width = 40;
-                    nb.Value = 0xff;
-                    nb.Digits = 2;
-                    nb.Maximum = 0xff;
-                    nb.Font = Courier.Font;
-                    nb.TextAlign = HorizontalAlignment.Center;
+                    NumberBox nb = new()
+                    {
+                        Anchor = AnchorStyles.Left | AnchorStyles.Right,
+                        Margin = new(0),
+                        Font = Courier.Font,
+                        Digits = 2,
+                        Value = 0xff,
+                        Maximum = 0xff,
+                        TextAlign = HorizontalAlignment.Center
+                    };
                     nb.Leave += Nb_Leave;
-                    dataBox[i][x] = nb;
-                    Controls.Add(nb);
+                    dataBox[y][x] = nb;
+                    MemView.Controls.Add(nb, x + 1, y + 1);
                 }
             }
             TBOX_DSM.BorderStyle = BorderStyle.None;
-            TBOX_DSM.Top = 15 * 35 + 90;
-            TBOX_DSM.Width = 695;
-            BUT_RET.Left = BUT_BC.Left = BUT_DE.Left = BUT_HL.Left = BUT_SP.Left = BUT_PC.Left = 730;
-            BUT_RET.Width = BUT_BC.Width = BUT_DE.Width = BUT_HL.Width = BUT_SP.Width = BUT_PC.Width = 70;
         }
 
         private void Ab_Leave(object sender, EventArgs e)

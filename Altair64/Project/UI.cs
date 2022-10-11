@@ -5,6 +5,7 @@ using Nicsure.Altair8800.Hardware.Interfaces;
 using Nicsure.CustomControls;
 using Nicsure.General;
 using Nicsure.Intel8080;
+using static System.Windows.Forms.AxHost;
 
 namespace Altair64.Project
 {
@@ -23,6 +24,7 @@ namespace Altair64.Project
         private IPWM[] addressLEDs;
         private IPWM[] dataLEDs;
         private IPWM[] statusLEDs;
+        private FrontSwitch[] frontSwitches;
         private bool canInvoke = true;
         private readonly static string[] nullFile = { null };
         private Monitor monitor;
@@ -65,6 +67,20 @@ namespace Altair64.Project
             InitializeComponent();            
         }
 
+        private static Preset GetPreset()
+        {
+            Preset p = new()
+            {
+                Name = string.Empty,
+                Description = String.Empty
+            };
+            for (int i = 0; i < 8; i++)
+                p.Switches[i] = Altair8800.GetSwitch(i);
+            Altair8800.GetState(true);
+            Array.Copy(Altair8800.MachineState, 0, p.State, 0, 0x10100);
+            return p;
+        }
+
         private void Init()
         {
             Mon.Invoker = this;
@@ -81,6 +97,7 @@ namespace Altair64.Project
             statusLEDs[(int)StatusLED.M1] = LED_M1;
             statusLEDs[(int)StatusLED.INT] = LED_INT;
             statusLEDs[(int)StatusLED.RM] = LED_RM;
+            frontSwitches = new FrontSwitch[] { SW_A0, SW_A1, SW_A2, SW_A3, SW_A4, SW_A5, SW_A6, SW_A7 };
             Altair8800.StatusReadout = this;
             Mon.LogReceiever = MonitorLog;
             Mon.MsgReceiever = MonitorMessage;
@@ -109,8 +126,7 @@ namespace Altair64.Project
         {
             for (int i = 0; i < 8; i++)
             {
-                FrontSwitch fs = (FrontSwitch)Controls[Controls.IndexOfKey("SW_A" + i)];
-                fs.Checked = Altair8800.GetSwitch(i);
+                frontSwitches[i].Checked = Altair8800.GetSwitch(i);
             }
         }
 
@@ -428,15 +444,22 @@ namespace Altair64.Project
 
         private void UI_Shown(object sender, EventArgs e)
         {
-
-            monitor = new();
-            monitor.TopLevel = false;
-            monitor.Visible = false;
+            FormBorderStyle fbs = this.FormBorderStyle;
+            this.FormBorderStyle = FormBorderStyle.None;
+            this.Width = MainPanel.Width;
+            this.Height = MainPanel.Height;
+            MainPanel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom;
+            this.FormBorderStyle = fbs;
+            monitor = new()
+            {
+                TopLevel = false,
+                Visible = false,
+                Size = TBOX_Monitor.Size,
+                Location = TBOX_Monitor.Location,
+                Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right
+            };
             monitor.Init();
-            monitor.Size = TBOX_Monitor.Size;
-            monitor.Location = TBOX_Monitor.Location;
-            monitor.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
-            Controls.Add(monitor);
+            MainPanel.Controls.Add(monitor);
             BUT_Commit.Visible = false;
             this.Init();
             Terminal.Init();
@@ -593,9 +616,8 @@ namespace Altair64.Project
             for (int i = 0; i < 8; i++)
             {
                 Altair8800.SetSwitch(i, false);
-                FrontSwitch fs = (FrontSwitch)Controls[Controls.IndexOfKey("SW_A" + i)];
-                fs.Checked = false;
-                fs.Momentary = CB_SenseSwMomentary.Checked;
+                frontSwitches[i].Checked = false;
+                frontSwitches[i].Momentary = CB_SenseSwMomentary.Checked;
             }
         }
 

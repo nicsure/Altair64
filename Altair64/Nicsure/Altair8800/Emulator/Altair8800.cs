@@ -1,4 +1,6 @@
-﻿using Nicsure.Altair8800.Hardware.Interfaces;
+﻿using Altair64.Project;
+using Nicsure.Altair8800.Hardware;
+using Nicsure.Altair8800.Hardware.Interfaces;
 using Nicsure.General;
 using Nicsure.Intel8080;
 using System;
@@ -59,6 +61,7 @@ namespace Nicsure.Altair8800.Emulator
         private static Thread initThread = null;
         private static readonly byte[] status = new byte[140];
         private static readonly byte[] state = new byte[0x10100];
+        public static byte[] MachineState => state;
 
         // We need to keep perm references to the callback delegates which are passed to the DLL.
         // Just passing the methods directly creates temporary delegate objects that eventually
