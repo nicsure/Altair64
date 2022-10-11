@@ -654,7 +654,7 @@ namespace Altair64.Project
 
         private void RegEdit_Leave(object sender, EventArgs e)
         {
-            if (!IsRunning) return;
+            if (IsRunning) return;
             Altair8800.GetState();
             Altair8800.SetReg(7, (int)NUD_A.Value, false);
             Altair8800.SetReg(0, (int)NUD_BC.Value, true);
@@ -669,7 +669,7 @@ namespace Altair64.Project
 
         private void StatusFlag_Clicked(object sender, EventArgs e)
         {
-            if (!IsRunning) return;
+            if (IsRunning) return;
             int f = 2;
             f |= CB_CF.Checked ? 1 : 0;
             f |= CB_PF.Checked ? 4 : 0;
