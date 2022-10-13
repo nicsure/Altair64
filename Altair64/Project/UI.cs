@@ -1,3 +1,4 @@
+using NAudio.MediaFoundation;
 using Nicsure.Altair8800;
 using Nicsure.Altair8800.Emulator;
 using Nicsure.Altair8800.Hardware;
@@ -5,6 +6,8 @@ using Nicsure.Altair8800.Hardware.Interfaces;
 using Nicsure.CustomControls;
 using Nicsure.General;
 using Nicsure.Intel8080;
+using System.Runtime.CompilerServices;
+using System.Runtime.Intrinsics.Arm;
 using static System.Windows.Forms.AxHost;
 
 namespace Altair64.Project
@@ -67,18 +70,86 @@ namespace Altair64.Project
             InitializeComponent();            
         }
 
-        private static Preset GetPreset()
+        private Preset GetPreset(bool state)
         {
             Preset p = new()
             {
-                Name = string.Empty,
-                Description = String.Empty
+                Speed = (int)NUD_Speed.Value,
+                Status = CB_DoStatus.Checked,
             };
-            for (int i = 0; i < 8; i++)
-                p.Switches[i] = Altair8800.GetSwitch(i);
-            Altair8800.GetState(true);
-            Array.Copy(Altair8800.MachineState, 0, p.State, 0, 0x10100);
+            for (int i = 0; i < 16; i++)
+            {
+                if (i < 8)
+                    p.Switches[i] = Altair8800.GetSwitch(i);
+                p.Disks[i] = ui.diskController.DiskFiles[i];
+            }
+            p.Terminal[0] = Terminal.Irq;
+            p.Terminal[1] = Terminal.Bel;
+            p.Terminal[2] = Terminal.Flash;
+            p.Terminal[3] = Terminal.Telnet;
+            p.Terminal[4] = Terminal.Cls;
+            p.Terminal[5] = Terminal.BasicBackspace;
+            p.Terminal[6] = Terminal.Echo;
+            p.Terminal[7] = Terminal.LF;
+            if (state)
+            {
+                p.State = new byte[0x10100];
+                Altair8800.GetState(true);
+                Array.Copy(Altair8800.MachineState, 0, p.State, 0, 0x10100);
+            }
             return p;
+        }
+
+        private void SetPreset(Preset p, bool run)
+        {
+            Altair8800.PerformReset(true);
+            NUD_Speed.Value = p.Speed;
+            Altair8800.SetSpeed(p.Speed);
+            CB_DoStatus.Checked = p.Status;
+            Altair8800.DoStatus(p.Status);
+            for (int i = 0; i < 16; i++)
+                diskController.InsertDiskImage(i, null, false);
+            for (int i = 0; i < 16; i++)
+            {
+                if (i < 8)
+                {
+                    Altair8800.SetSwitch(i, p.Switches[i]);
+                    frontSwitches[i].Checked = p.Switches[i];
+                }
+                bool ram = false;
+                string disk = p.Disks[i];
+                if (disk != null && !disk.Equals("null") && disk.Length > 0)
+                {
+                    if (disk.StartsWith("RAM:"))
+                    {
+                        ram = true;
+                        disk = disk[4..];
+                    }
+                    if (disk.Equals("null"))
+                        disk = null;
+                    diskController.InsertDiskImage(i, disk, ram);
+                }
+                if (i < 4)
+                    ui.UpdateDiskName(i);
+            }
+            Terminal.Irq = p.Terminal[0];
+            Terminal.Bel = p.Terminal[1];
+            Terminal.Flash = p.Terminal[2];
+            Terminal.Telnet = p.Terminal[3];
+            Terminal.Cls = p.Terminal[4];
+            Terminal.BasicBackspace = p.Terminal[5];
+            Terminal.Echo = p.Terminal[6];
+            Terminal.LF = p.Terminal[7];
+            if(p.State != null)
+            {
+                Array.Copy(p.State, 0, Altair8800.MachineState, 0, p.State.Length);
+                Altair8800.SetState(true);
+            }
+            if(run)
+            {
+                SW_RunStop.Checked = true;
+                Altair8800.RunMode();
+            }
         }
 
         private void Init()
@@ -392,7 +463,6 @@ namespace Altair64.Project
                     else
                     {
                         Mon.Log("RAM Mirrored Disk conversion complete.");
-                        ButtonHighlight((HButton)button, true, 0);
                         UpdateDiskName(drive);
                     }
                 }
@@ -400,16 +470,20 @@ namespace Altair64.Project
             else
             if (clicked == TSMI_MountBlank)
             {
-                ButtonHighlight((HButton)GetDiskControl(drive, DiskControl.BUTTON), true, 1);
                 diskController.InsertDiskImage(drive, "*BLANK", true);
                 UpdateDiskName(drive);
             }
         }
 
-        private void UpdateDiskName(int dnum)
+        public void UpdateDiskName(int dnum)
         {
             String name = diskController.DiskNames[dnum] ?? "(Empty)";
             ((Button)GetDiskControl(dnum, DiskControl.LABEL)).Text = name;
+            ButtonHighlight(
+                (HButton)GetDiskControl(dnum, DiskControl.BUTTON),
+                diskController.IsPopulated(dnum),
+                diskController.IsRamMirror(dnum) ? 1 : 0
+            );
         }
 
         private void Disk_Button_Clicked(object sender, EventArgs e)
@@ -422,7 +496,6 @@ namespace Altair64.Project
                 {
                     if (diskController.InsertDiskImage(diskNo, file, e == null))
                     {
-                        ButtonHighlight((HButton)sender, true, e == null ? 1 : 0);
                         Mon.Log("Disk image '" + OFD_Load.SafeFileName + "' inserted into drive " + diskNo);
                         UpdateDiskName(diskNo);
                         return;
@@ -434,10 +507,8 @@ namespace Altair64.Project
             else
             {
                 diskNo %= 10;
-                sender = GetDiskControl(diskNo, DiskControl.BUTTON);
                 diskController.InsertDiskImage(diskNo, null);
                 Mon.Log("Disk in drive " + diskNo + " ejected");
-                ButtonHighlight((HButton)sender, false);
                 UpdateDiskName(diskNo);
             }
         }
@@ -723,6 +794,17 @@ namespace Altair64.Project
         private void LL_Youtube_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(LL_Youtube.Text) { UseShellExecute = true });
+        }
+
+        private void BUT_Presets_Click(object sender, EventArgs e)
+        {
+            if(!Altair8800.Running)
+            {
+                Presets presetUI = new(SetPreset, GetPreset);
+                presetUI.ShowDialog();
+            }
+            else
+                Mon.Wrn("Must be in stopped state to access Presets.");
         }
     }
 

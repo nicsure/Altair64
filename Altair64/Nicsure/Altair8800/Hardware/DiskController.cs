@@ -21,12 +21,14 @@ namespace Nicsure.Altair8800.Hardware
         private bool writeMode = false, intEnable = false, strobeSectorReady = true;
         private readonly Stream[] disk = { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null };
         private int GetDiskOffset(int secSeek) => (currentSector * 137) + (headPosition * 4384) + secSeek;
-        private readonly String[] diskNames = new string[16];
+        private readonly String[] diskNames = { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null };
+        private readonly String[] diskFiles = { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null };
         private readonly System.Reflection.Assembly objAssembly;
 
         public Control[] DriveLEDs { get; set; } = { null, null, null, null };
 
         public String[] DiskNames => diskNames;
+        public String[] DiskFiles => diskFiles;
         public int DriveSelectRegister { get; }
         public int DriveStatusRegister { get; }
         public int CommandRegister { get; }
@@ -95,6 +97,10 @@ namespace Nicsure.Altair8800.Hardware
             return blank;
         }
 
+        public bool IsRamMirror(int dnum) => IsPopulated(dnum) && disk[dnum] is MemoryStream;
+
+        public bool IsPopulated(int dnum) => disk[dnum] != null;
+
         public bool InsertDiskImage(int diskNo, String file, bool ramDisk = false)
         {
             disk[diskNo]?.Dispose(); // destroy any disk that was in there already
@@ -114,9 +120,9 @@ namespace Nicsure.Altair8800.Hardware
                         disk[diskNo] = new MemoryStream(Mon.ReadAllBytes(file)) : // create a memory stream from the disk image
                         Mon.Open(file, FileMode.Open, FileAccess.ReadWrite); // just use the file stream of the disk image
                 }
-                file = (ramDisk ? "[RAM Mirror] " : "") + Path.GetFileNameWithoutExtension(file); // save the disk name for the UI
             }
-            diskNames[diskNo] = disk[diskNo] == null ? null : file; // update the disk name
+            diskNames[diskNo] = disk[diskNo] == null ? null : (ramDisk ? "[RAM Mirror] " : "") + Path.GetFileNameWithoutExtension(file); // update the disk name
+            diskFiles[diskNo] = disk[diskNo] == null ? null : (ramDisk ? "RAM:" : "") + file;
             return disk[diskNo] != null; // return success/failure
         }
 

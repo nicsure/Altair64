@@ -17,40 +17,58 @@ namespace Altair64.Project
     public partial class Presets : Form
     {
         private bool change = false;
+        private readonly Action<Preset, bool> Set;
+        private readonly Func<bool, Preset> Get;
 
-        public Presets()
+        public Presets(Action<Preset, bool> set, Func<bool, Preset> get)
         {
+            Set = set;
+            Get = get;
             InitializeComponent();
+        }
+
+        private int AddRow(Preset p)
+        {
+            int r = PresetGrid.Rows.Add(p.Name, p.Description, "Load", "Run");
+            PresetGrid.Rows[r].Tag = p;
+            return r;
         }
 
         private void Presets_Shown(object sender, EventArgs e)
         {
-            PresetGrid.Rows.Add("TEST NAME", "TEST DESCRIPTION");
-            Preset.Load();
             for (int i = 0; i < Preset.Size; i++)
             {
-                Preset p = Preset.Get(i);
-                int r = PresetGrid.Rows.Add(p.Name, p.Description);
-                PresetGrid.Rows[r].Tag = p;
-            }
+                AddRow(Preset.Get(i));
+            }            
         }
 
         private void PresetGrid_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
             DataGridViewRow row = PresetGrid.Rows[e.RowIndex];
-            Preset p = row.Tag as Preset;
-            if (p == null)
+            if (row.Tag is Preset p)
             {
-                
+                string desc = row.Cells[1].Value as string;
+                string name = row.Cells[0].Value as string;
+                if (desc != p.Description || name != p.Name)
+                {
+                    p.Description = desc;
+                    p.Name = name;
+                }
+                change = true;
             }
-            string desc = row.Cells[1].Value as string;
-            string name = row.Cells[0].Value as string;
-            if (desc != p.Description || name != p.Name)
-            {
-                p.Description = desc;
-                p.Name = name;
-                //change = true;
-            }
+        }
+
+        private void AddNewEntry(bool ram)
+        {
+            Preset p = Get(ram);            
+            p.Name = "changeme";
+            p.Description = "";
+            PresetGrid.EndEdit();
+            int r = AddRow(p);
+            Preset.Presets.Add(p);
+            PresetGrid.Rows[r].Cells[0].Selected = true;
+            PresetGrid.BeginEdit(true);
+            change = true;
         }
 
         private void Presets_FormClosing(object sender, FormClosingEventArgs e)
@@ -66,22 +84,62 @@ namespace Altair64.Project
 
         private void Controls_Leave(object sender, EventArgs e)
         {
-            ((Control)sender).BackColor = BackColor;
+            ((Control)sender).BackColor = SystemColors.InactiveBorder;
+        }
+
+        private void Controls_Clicked(object sender, EventArgs e)
+        {
+            if (sender == Delete)
+            {
+                DataGridViewRow row = PresetGrid.SelectedRows.Count > 0 ? PresetGrid.SelectedRows[0] : null;
+                if (row != null && row.Tag is Preset p)
+                {
+                    Preset.Presets.Remove(p);
+                    PresetGrid.Rows.Remove(row);
+                    change = true;
+                }
+            }
+            else
+            {
+                AddNewEntry(sender == AddNewRam);
+            }
+        }
+
+        private void PresetGrid_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            Preset p = Preset.Get(e.RowIndex);
+            switch (e.ColumnIndex)
+            {
+                case 2:
+                    Set(p, false);
+                    break;
+                case 3:
+                    Set(p, true);
+                    Close();
+                    break;
+            }
         }
     }
 
     public class Preset
     {
         private const string presetFile = "presets.conf";
-        private static List<Preset> Presets { get; } = new List<Preset>();
+        public static List<Preset> Presets { get; } = new List<Preset>();
         public static int Size => Presets.Count;
         public static Preset Get(int i) => Presets[i]; 
         public string Name { get; set; }
         public string Description { get; set; }
         public bool[] Switches { get; } = new bool[8];
-        public byte[] State { get; set; }
+        public byte[] State { get; set; } = null;
         public string[] Disks { get; } = new string[16];
         public bool[] Terminal { get; } = new bool[8];
+        public int Speed { get; set; } = 500;
+        public bool Status { get; set; } = true;
+
+        static Preset()
+        {
+            Load();
+        }
 
         public static void Save()
         {
@@ -95,7 +153,10 @@ namespace Altair64.Project
                     f += disk + ";";
                 foreach (bool term in p.Terminal)
                     f += term + ";";
-                f += Encode(p.State);
+                f += p.Speed + ";";
+                f += p.Status + ";";
+                if (p.State != null)
+                    f += Encode(p.State);
                 writer.WriteLine(f);
             }
         }
@@ -118,6 +179,8 @@ namespace Altair64.Project
                         p.Disks[i] = e[c++];
                     for (int i = 0; i < p.Terminal.Length; i++)
                         p.Terminal[i] = bool.Parse(e[c++]);
+                    p.Speed = int.Parse(e[c++]);
+                    p.Status = bool.Parse(e[c++]);
                     p.State = Decode(e[c]);
                     Presets.Add(p);
                 }
@@ -126,45 +189,14 @@ namespace Altair64.Project
 
         public static string Encode(byte[] b)
         {
-            int m = 3 - (b.Length % 3);
-            if (m < 3)
-            {
-                byte[] c = new byte[b.Length + m];
-                Array.Copy(b, 0, c, 0, b.Length);
-                b = c;
-            }
-            string r = string.Empty;
-            for (int i = 0; i < b.Length; i += 3)
-            {
-                int c1 = (b[i] & 0xfc) >> 2;
-                int c2 = ((b[i] & 0x03) << 4) | ((b[i + 1] & 0xf0) >> 4);
-                int c3 = ((b[i + 1] & 0x0F) << 2) | ((b[i + 2] & 0xc0) >> 6);
-                int c4 = b[i + 2] & 0x3f;
-                c1 += 33;
-                c2 += 33;
-                c3 += 33;
-                c4 += 33;
-                r += (char)c1 + (char)c2 + (char)c3 + (char)c4;
-            }
-            return r;
+            return System.Convert.ToBase64String(b);
         }
 
         public static byte[] Decode(string s)
         {
-            while (s.Length % 4 != 0) s += "!";
-            byte[] b = new byte[(s.Length / 4) * 3];
-            int bc = 0;
-            for (int i = 0; i < s.Length; i += 4)
-            {
-                int c1 = s[i] - 33;
-                int c2 = s[i + 1] - 33;
-                int c3 = s[i + 2] - 33;
-                int c4 = s[i + 3] - 33;
-                b[bc++] = (byte)((c1 << 2) | ((c2 & 0x30) >> 4));
-                b[bc++] = (byte)(((c2 & 0x0f) << 4) | ((c3 & 0x3c) >> 2));
-                b[bc++] = (byte)(((c3 & 0x03) << 6) | c4);
-            }
-            return b;
+            if (s == null || s.Length == 0)
+                return null;
+            return System.Convert.FromBase64String(s);
         }
     }
 }

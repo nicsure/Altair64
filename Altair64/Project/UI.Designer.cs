@@ -1058,6 +1058,7 @@ namespace Altair64.Project
             this.BUT_Presets.TabIndex = 75;
             this.BUT_Presets.Text = "PRESETS";
             this.BUT_Presets.UseVisualStyleBackColor = false;
+            this.BUT_Presets.Click += new System.EventHandler(this.BUT_Presets_Click);
             // 
             // NUD_HL
             // 
