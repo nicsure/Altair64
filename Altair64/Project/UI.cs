@@ -76,6 +76,7 @@ namespace Altair64.Project
             {
                 Speed = (int)NUD_Speed.Value,
                 Status = CB_DoStatus.Checked,
+                Momentary = CB_SenseSwMomentary.Checked
             };
             for (int i = 0; i < 16; i++)
             {
@@ -104,52 +105,40 @@ namespace Altair64.Project
         {
             Altair8800.PerformReset(true);
             NUD_Speed.Value = p.Speed;
-            Altair8800.SetSpeed(p.Speed);
             CB_DoStatus.Checked = p.Status;
-            Altair8800.DoStatus(p.Status);
+            CB_SenseSwMomentary.Checked = p.Momentary;
             for (int i = 0; i < 16; i++)
                 diskController.InsertDiskImage(i, null, false);
             for (int i = 0; i < 16; i++)
             {
-                if (i < 8)
-                {
-                    Altair8800.SetSwitch(i, p.Switches[i]);
-                    frontSwitches[i].Checked = p.Switches[i];
-                }
-                bool ram = false;
                 string disk = p.Disks[i];
                 if (disk != null && !disk.Equals("null") && disk.Length > 0)
                 {
-                    if (disk.StartsWith("RAM:"))
-                    {
-                        ram = true;
-                        disk = disk[4..];
-                    }
-                    if (disk.Equals("null"))
-                        disk = null;
+                    bool ram;
+                    if(ram = disk.StartsWith("RAM:")) disk = disk[4..];
                     diskController.InsertDiskImage(i, disk, ram);
                 }
-                if (i < 4)
-                    ui.UpdateDiskName(i);
+                if (i < 8)
+                {
+                    frontSwitches[i].Checked = p.Switches[i];
+                    if (i < 4)
+                        UpdateDiskName(i);
+                }
             }
-            Terminal.Irq = p.Terminal[0];
-            Terminal.Bel = p.Terminal[1];
-            Terminal.Flash = p.Terminal[2];
-            Terminal.Telnet = p.Terminal[3];
-            Terminal.Cls = p.Terminal[4];
-            Terminal.BasicBackspace = p.Terminal[5];
-            Terminal.Echo = p.Terminal[6];
-            Terminal.LF = p.Terminal[7];
+            SetTerminalOption(LAB_Irq, p.Terminal[0]);
+            SetTerminalOption(LAB_Bel, p.Terminal[1]);
+            SetTerminalOption(LAB_Flash, p.Terminal[2]);
+            SetTerminalOption(LAB_Telnet, p.Terminal[3]);
+            SetTerminalOption(LAB_Cls, p.Terminal[4]);
+            SetTerminalOption(LAB_BasicBackspace, p.Terminal[5]);
+            SetTerminalOption(LAB_Echo, p.Terminal[6]);
+            SetTerminalOption(LAB_LF, p.Terminal[7]);
             if(p.State != null)
             {
                 Array.Copy(p.State, 0, Altair8800.MachineState, 0, p.State.Length);
                 Altair8800.SetState(true);
             }
-            if(run)
-            {
-                SW_RunStop.Checked = true;
-                Altair8800.RunMode();
-            }
+            RunStop(run);
         }
 
         private void Init()
@@ -246,19 +235,23 @@ namespace Altair64.Project
             }
         }
 
+        private void RunStop(bool? run)
+        {
+            bool go = run == null ? !Altair8800.Running : run.Value;
+            if (go != Altair8800.Running)
+            {
+                SW_RunStop.Checked = go;
+                if (go)
+                    Altair8800.RunMode();
+                else
+                    StopRuntime();
+
+            }
+        }
+
         private void BUT_Run_Click(object sender, EventArgs e)
         {
-            if (SW_RunStop.Checked)
-            {
-                if (!Altair8800.Running)
-                {
-                    //stateTimer.Start();
-                    Mon.Log("SYSTEM STARTED");
-                    Altair8800.RunMode();
-                }
-            }
-            else
-                StopRuntime();
+            RunStop(null);
         }
 
         private static void WriteBytesToInterface(ISendToAble userInterface, byte[] data)
@@ -597,43 +590,49 @@ namespace Altair64.Project
             Altair8800.SetSwitch(swNum, sw.Checked);
         }
 
-        private void Terminal_Option_Clicked(object sender, EventArgs e)
+        private void SetTerminalOption(Label label, bool? b)
         {
-            Label label = (Label)sender;
             int i = Convert.ToInt32(label.Tag);
-            bool b = false;
+            bool v;
             switch (i)
             {
                 case 0:
-                    b = (Terminal.Irq = !Terminal.Irq);
+                    Terminal.Irq = v = (b == null ? !Terminal.Irq : b.Value);
                     break;
                 case 1:
-                    b = (Terminal.Bel = !Terminal.Bel);
+                    Terminal.Bel = v = (b == null ? !Terminal.Bel : b.Value);
                     break;
                 case 2:
-                    b = (Terminal.Flash = !Terminal.Flash);
+                    Terminal.Flash = v = (b == null ? !Terminal.Flash : b.Value);
                     break;
                 case 3:
-                    b = (Terminal.Telnet = !Terminal.Telnet);
+                    Terminal.Telnet = v = (b == null ? !Terminal.Telnet : b.Value);
                     break;
                 case 4:
-                    b = (Terminal.Cls = !Terminal.Cls);
+                    Terminal.Cls = v = (b == null ? !Terminal.Cls : b.Value);
                     break;
                 case 5:
-                    b = (Terminal.BasicBackspace = !Terminal.BasicBackspace);
+                    Terminal.BasicBackspace = v = (b == null ? !Terminal.BasicBackspace : b.Value);
                     break;
                 case 6:
-                    b = (Terminal.Echo = !Terminal.Echo);
+                    Terminal.Echo = v = (b == null ? !Terminal.Echo : b.Value);
                     break;
                 case 8:
-                    b = (Terminal.LF = !Terminal.LF);
+                    Terminal.LF = v = (b == null ? !Terminal.LF : b.Value);
                     break;
+                default:
                 case 7:
                     Terminal.ClearScreen();
                     return;
             }
-            label.ForeColor = !b ? LAB_Ref.ForeColor : LAB_Ref.BackColor;
-            label.BackColor = !b ? LAB_Ref.BackColor : LAB_Ref.ForeColor;
+            label.ForeColor = !v ? LAB_Ref.ForeColor : LAB_Ref.BackColor;
+            label.BackColor = !v ? LAB_Ref.BackColor : LAB_Ref.ForeColor;
+        }
+
+        private void Terminal_Option_Clicked(object sender, EventArgs e)
+        {
+            Label label = (Label)sender;
+            SetTerminalOption(label, null);
         }
 
         private void Examine_Clicked(object sender, EventArgs e)
@@ -773,7 +772,7 @@ namespace Altair64.Project
             ReportSpeed();
         }
 
-        private void CB_DoStatus_Click(object sender, EventArgs e)
+        private void CB_DoStatus_CheckedChanged(object sender, EventArgs e)
         {
             Altair8800.DoStatus(CB_DoStatus.Checked);
         }

@@ -53,7 +53,7 @@ namespace Altair64.Project
             this.LAB_Ref = new System.Windows.Forms.Label();
             this.TLP_TerminalOptions = new System.Windows.Forms.TableLayoutPanel();
             this.LAB_Clear = new System.Windows.Forms.Label();
-            this.label45 = new System.Windows.Forms.Label();
+            this.LAB_LF = new System.Windows.Forms.Label();
             this.LAB_Echo = new System.Windows.Forms.Label();
             this.LAB_BasicBackspace = new System.Windows.Forms.Label();
             this.LAB_Cls = new System.Windows.Forms.Label();
@@ -492,7 +492,7 @@ namespace Altair64.Project
             this.TLP_TerminalOptions.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
             this.TLP_TerminalOptions.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
             this.TLP_TerminalOptions.Controls.Add(this.LAB_Clear, 8, 0);
-            this.TLP_TerminalOptions.Controls.Add(this.label45, 7, 0);
+            this.TLP_TerminalOptions.Controls.Add(this.LAB_LF, 7, 0);
             this.TLP_TerminalOptions.Controls.Add(this.LAB_Echo, 6, 0);
             this.TLP_TerminalOptions.Controls.Add(this.LAB_BasicBackspace, 5, 0);
             this.TLP_TerminalOptions.Controls.Add(this.LAB_Cls, 4, 0);
@@ -526,22 +526,22 @@ namespace Altair64.Project
             this.LAB_Clear.Text = "CLEAR";
             this.LAB_Clear.Click += new System.EventHandler(this.Terminal_Option_Clicked);
             // 
-            // label45
+            // LAB_LF
             // 
-            this.label45.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.label45.AutoSize = true;
-            this.label45.BackColor = System.Drawing.Color.Black;
-            this.label45.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.label45.Font = new System.Drawing.Font("Lucida Console", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.label45.ForeColor = System.Drawing.Color.DarkOrange;
-            this.label45.Location = new System.Drawing.Point(1150, 12);
-            this.label45.Margin = new System.Windows.Forms.Padding(0);
-            this.label45.Name = "label45";
-            this.label45.Size = new System.Drawing.Size(40, 24);
-            this.label45.TabIndex = 9;
-            this.label45.Tag = "8";
-            this.label45.Text = "LF";
-            this.label45.Click += new System.EventHandler(this.Terminal_Option_Clicked);
+            this.LAB_LF.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.LAB_LF.AutoSize = true;
+            this.LAB_LF.BackColor = System.Drawing.Color.Black;
+            this.LAB_LF.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.LAB_LF.Font = new System.Drawing.Font("Lucida Console", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.LAB_LF.ForeColor = System.Drawing.Color.DarkOrange;
+            this.LAB_LF.Location = new System.Drawing.Point(1150, 12);
+            this.LAB_LF.Margin = new System.Windows.Forms.Padding(0);
+            this.LAB_LF.Name = "LAB_LF";
+            this.LAB_LF.Size = new System.Drawing.Size(40, 24);
+            this.LAB_LF.TabIndex = 9;
+            this.LAB_LF.Tag = "8";
+            this.LAB_LF.Text = "LF";
+            this.LAB_LF.Click += new System.EventHandler(this.Terminal_Option_Clicked);
             // 
             // LAB_Echo
             // 
@@ -1237,7 +1237,7 @@ namespace Altair64.Project
             this.CB_DoStatus.TabIndex = 39;
             this.CB_DoStatus.Text = "Status";
             this.CB_DoStatus.UseVisualStyleBackColor = true;
-            this.CB_DoStatus.Click += new System.EventHandler(this.CB_DoStatus_Click);
+            this.CB_DoStatus.CheckedChanged += new System.EventHandler(this.CB_DoStatus_CheckedChanged);
             // 
             // tableLayoutPanel4
             // 
@@ -3765,7 +3765,7 @@ namespace Altair64.Project
         private System.Windows.Forms.Label label43;
         private VariableLED LED_WAIT;
         private System.Windows.Forms.Label label44;
-        private System.Windows.Forms.Label label45;
+        private System.Windows.Forms.Label LAB_LF;
         private HButton BUT_CassAudio;
         private VariableLED LED_Cassette;
         private VariableLED LED_CassetteData;

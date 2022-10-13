@@ -7,6 +7,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -63,6 +64,12 @@ namespace Altair64.Project
             Preset p = Get(ram);            
             p.Name = "changeme";
             p.Description = "";
+            if (ram)
+            {
+                p.StateFile = Preset.RandomFile();
+                File.WriteAllBytes(p.StateFile, p.State);
+                p.State = null;
+            }
             PresetGrid.EndEdit();
             int r = AddRow(p);
             Preset.Presets.Add(p);
@@ -94,6 +101,8 @@ namespace Altair64.Project
                 DataGridViewRow row = PresetGrid.SelectedRows.Count > 0 ? PresetGrid.SelectedRows[0] : null;
                 if (row != null && row.Tag is Preset p)
                 {
+                    if (p.StateFile != null)
+                        File.Delete(p.StateFile);
                     Preset.Presets.Remove(p);
                     PresetGrid.Rows.Remove(row);
                     change = true;
@@ -108,22 +117,26 @@ namespace Altair64.Project
         private void PresetGrid_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
             Preset p = Preset.Get(e.RowIndex);
-            switch (e.ColumnIndex)
+            bool run = e.ColumnIndex == 3;
+            if (e.ColumnIndex == 2 || run)
             {
-                case 2:
-                    Set(p, false);
-                    break;
-                case 3:
-                    Set(p, true);
-                    Close();
-                    break;
+                if (p.StateFile != null)
+                    p.State = File.ReadAllBytes(p.StateFile);
+                Set(p, run);
+                p.State = null;
             }
+            if (run) Close();
         }
+
     }
 
     public class Preset
     {
+        private const string presetDir = "preset";
         private const string presetFile = "presets.conf";
+        private static readonly RandomNumberGenerator rnd = RandomNumberGenerator.Create();
+
+        private static readonly char sep = Path.DirectorySeparatorChar;
         public static List<Preset> Presets { get; } = new List<Preset>();
         public static int Size => Presets.Count;
         public static Preset Get(int i) => Presets[i]; 
@@ -131,19 +144,22 @@ namespace Altair64.Project
         public string Description { get; set; }
         public bool[] Switches { get; } = new bool[8];
         public byte[] State { get; set; } = null;
+        public string StateFile { get; set; } = null;
         public string[] Disks { get; } = new string[16];
         public bool[] Terminal { get; } = new bool[8];
         public int Speed { get; set; } = 500;
         public bool Status { get; set; } = true;
+        public bool Momentary { get; set; }
 
         static Preset()
         {
+            Directory.CreateDirectory(presetDir);
             Load();
         }
 
         public static void Save()
         {
-            using StreamWriter writer = new(presetFile);
+            using StreamWriter writer = new(presetDir + sep + presetFile);
             foreach (var p in Presets)
             {
                 string f = p.Name.Replace(';', ':') + ";" + p.Description.Replace(';', ':') + ";";
@@ -155,8 +171,9 @@ namespace Altair64.Project
                     f += term + ";";
                 f += p.Speed + ";";
                 f += p.Status + ";";
-                if (p.State != null)
-                    f += Encode(p.State);
+                f += p.Momentary + ";";
+                if (p.StateFile != null)
+                    f += p.StateFile;
                 writer.WriteLine(f);
             }
         }
@@ -164,9 +181,9 @@ namespace Altair64.Project
         public static void Load()
         {
             Presets.Clear();
-            if (File.Exists(presetFile))
+            if (File.Exists(presetDir + sep + presetFile))
             {
-                foreach (string line in File.ReadLines(presetFile))
+                foreach (string line in File.ReadLines(presetDir + sep + presetFile))
                 {
                     int c = 0;
                     Preset p = new();
@@ -181,22 +198,23 @@ namespace Altair64.Project
                         p.Terminal[i] = bool.Parse(e[c++]);
                     p.Speed = int.Parse(e[c++]);
                     p.Status = bool.Parse(e[c++]);
-                    p.State = Decode(e[c]);
+                    p.Momentary = bool.Parse(e[c++]);
+                    p.StateFile = e[c].Length > 0 ? e[c] : null;
                     Presets.Add(p);
                 }
-            }            
+            }
         }
 
-        public static string Encode(byte[] b)
+        public static string RandomFile()
         {
-            return System.Convert.ToBase64String(b);
-        }
-
-        public static byte[] Decode(string s)
-        {
-            if (s == null || s.Length == 0)
-                return null;
-            return System.Convert.FromBase64String(s);
+            while (true)
+            {
+                byte[] b = new byte[8];
+                rnd.GetBytes(b);
+                String file = presetDir + sep + BitConverter.ToString(b).Replace("-", String.Empty) + ".bin";
+                if (!File.Exists(file))
+                    return file;
+            }
         }
     }
 }
