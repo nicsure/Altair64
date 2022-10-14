@@ -1,4 +1,5 @@
 ﻿using NAudio.Wave.SampleProviders;
+using Nicsure.General;
 using System;
 using System.Buffers.Text;
 using System.Collections.Generic;
@@ -17,11 +18,15 @@ namespace Altair64.Project
 
     public partial class Presets : Form
     {
-        private bool change = false;
-        private readonly Action<Preset, bool> Set;
-        private readonly Func<bool, Preset> Get;
+        public delegate void ApplyPreset(Preset preset, bool startRunning, byte[] machineState); // machineState can be null, in which case the preset has no state captured
+        public delegate Preset ObtainPreset(byte[] machineState); // if machineState is null, it means not to capture the state in the returned Preset
+        private static readonly byte[] NOSTATE = null;
 
-        public Presets(Action<Preset, bool> set, Func<bool, Preset> get)
+        private bool change = false;
+        private readonly ApplyPreset Set;
+        private readonly ObtainPreset Get;
+
+        public Presets(ApplyPreset set, ObtainPreset get)
         {
             Set = set;
             Get = get;
@@ -61,14 +66,14 @@ namespace Altair64.Project
 
         private void AddNewEntry(bool ram)
         {
-            Preset p = Get(ram);            
+            byte[] state = ram ? new byte[0x10100] : NOSTATE;
+            Preset p = Get(state);            
             p.Name = "changeme";
             p.Description = "";
             if (ram)
             {
                 p.StateFile = Preset.RandomFile();
-                File.WriteAllBytes(p.StateFile, p.State);
-                p.State = null;
+                Mon.WriteAllBytes(p.StateFile, state);
             }
             PresetGrid.EndEdit();
             int r = AddRow(p);
@@ -119,12 +124,7 @@ namespace Altair64.Project
             Preset p = Preset.Get(e.RowIndex);
             bool run = e.ColumnIndex == 3;
             if (e.ColumnIndex == 2 || run)
-            {
-                if (p.StateFile != null)
-                    p.State = File.ReadAllBytes(p.StateFile);
-                Set(p, run);
-                p.State = null;
-            }
+                Set(p, run, p.StateFile == null ? NOSTATE : Mon.ReadAllBytes(p.StateFile));
             if (run) Close();
         }
 
@@ -143,7 +143,6 @@ namespace Altair64.Project
         public string Name { get; set; }
         public string Description { get; set; }
         public bool[] Switches { get; } = new bool[8];
-        public byte[] State { get; set; } = null;
         public string StateFile { get; set; } = null;
         public string[] Disks { get; } = new string[16];
         public bool[] Terminal { get; } = new bool[8];
@@ -183,7 +182,7 @@ namespace Altair64.Project
             Presets.Clear();
             if (File.Exists(presetDir + sep + presetFile))
             {
-                foreach (string line in File.ReadLines(presetDir + sep + presetFile))
+                foreach (string line in Mon.ReadAllLines(presetDir + sep + presetFile))
                 {
                     int c = 0;
                     Preset p = new();

@@ -50,6 +50,17 @@ namespace Nicsure.General
             }
         }
 
+        public static string[] ReadAllLines(string file)
+        {
+            try
+            {
+                return File.ReadAllLines(file);
+            }
+            catch { }
+            Err("Unable to read text line file: " + file);
+            return Array.Empty<string>();
+        }
+
         public static byte[] ReadAllBytes(String file)
         {
             try
@@ -57,7 +68,7 @@ namespace Nicsure.General
                 return File.ReadAllBytes(file);
             }
             catch (Exception) { }
-            Err("Unable to read file: " + file);
+            Err("Unable to read bin file: " + file);
             return Array.Empty<byte>();
         }
 
@@ -68,7 +79,7 @@ namespace Nicsure.General
                 return File.ReadAllText(file);
             }
             catch (Exception) { }
-            Err("Unable to read file: " + file);
+            Err("Unable to read text file: " + file);
             return String.Empty;
         }
 
@@ -91,7 +102,7 @@ namespace Nicsure.General
             }
             catch (Exception)
             {
-                Err("Unable to write to file: " + file);
+                Err("Unable to write to bin file: " + file);
                 return false;
             }
             return true;

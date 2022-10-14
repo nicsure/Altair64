@@ -6,6 +6,7 @@ using Nicsure.Altair8800.Hardware.Interfaces;
 using Nicsure.CustomControls;
 using Nicsure.General;
 using Nicsure.Intel8080;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.Intrinsics.Arm;
 using static System.Windows.Forms.AxHost;
@@ -16,6 +17,9 @@ namespace Altair64.Project
     {
         // Code by nicsure (C)2022
         // https://www.youtube.com/nicsure
+
+        private static readonly bool? TOGGLE = null;
+        private static readonly byte[] NOSTATE = null;
 
         private static UI ui;
         private DiskController diskController;
@@ -70,7 +74,7 @@ namespace Altair64.Project
             InitializeComponent();            
         }
 
-        private Preset GetPreset(bool state)
+        private Preset GetPreset(byte[] state)
         {
             Preset p = new()
             {
@@ -92,16 +96,15 @@ namespace Altair64.Project
             p.Terminal[5] = Terminal.BasicBackspace;
             p.Terminal[6] = Terminal.Echo;
             p.Terminal[7] = Terminal.LF;
-            if (state)
+            if (state != NOSTATE)
             {
-                p.State = new byte[0x10100];
                 Altair8800.GetState(true);
-                Array.Copy(Altair8800.MachineState, 0, p.State, 0, 0x10100);
+                Array.Copy(Altair8800.MachineState, 0, state, 0, 0x10100);
             }
             return p;
         }
 
-        private void SetPreset(Preset p, bool run)
+        private void SetPreset(Preset p, bool run, byte[] state)
         {
             Altair8800.PerformReset(true);
             NUD_Speed.Value = p.Speed;
@@ -133,9 +136,9 @@ namespace Altair64.Project
             SetTerminalOption(LAB_BasicBackspace, p.Terminal[5]);
             SetTerminalOption(LAB_Echo, p.Terminal[6]);
             SetTerminalOption(LAB_LF, p.Terminal[7]);
-            if(p.State != null)
+            if(state != NOSTATE)
             {
-                Array.Copy(p.State, 0, Altair8800.MachineState, 0, p.State.Length);
+                Array.Copy(state, 0, Altair8800.MachineState, 0, state.Length);
                 Altair8800.SetState(true);
             }
             RunStop(run);
@@ -235,23 +238,25 @@ namespace Altair64.Project
             }
         }
 
-        private void RunStop(bool? run)
+        private void RunStop(bool? run) // run==null = toggle
         {
-            bool go = run == null ? !Altair8800.Running : run.Value;
+            bool go = run == TOGGLE ? !Altair8800.Running : run.Value;
             if (go != Altair8800.Running)
             {
                 SW_RunStop.Checked = go;
                 if (go)
                     Altair8800.RunMode();
                 else
-                    StopRuntime();
-
+                {
+                    Mon.Log("SYSTEM STOPPED");
+                    Altair8800.StepMode();
+                }
             }
         }
 
         private void BUT_Run_Click(object sender, EventArgs e)
         {
-            RunStop(null);
+            RunStop(TOGGLE);
         }
 
         private static void WriteBytesToInterface(ISendToAble userInterface, byte[] data)
@@ -353,13 +358,6 @@ namespace Altair64.Project
                     Mon.Log("Binary File '" + OFD_Load.SafeFileName + "' loaded to:" + addr.X4() + " Length:" + b.Length);
                 }
             }
-        }
-
-        private void StopRuntime()
-        {
-            Altair8800.StepMode();
-            SW_RunStop.Checked = false;
-            Mon.Log("SYSTEM STOPPED");
         }
 
         private void BUT_Reset_Click(object sender, EventArgs e)
@@ -590,35 +588,35 @@ namespace Altair64.Project
             Altair8800.SetSwitch(swNum, sw.Checked);
         }
 
-        private void SetTerminalOption(Label label, bool? b)
+        private void SetTerminalOption(Label label, bool? b) // b==null = Toggle
         {
             int i = Convert.ToInt32(label.Tag);
             bool v;
             switch (i)
             {
                 case 0:
-                    Terminal.Irq = v = (b == null ? !Terminal.Irq : b.Value);
+                    Terminal.Irq = v = (b == TOGGLE ? !Terminal.Irq : b.Value);
                     break;
                 case 1:
-                    Terminal.Bel = v = (b == null ? !Terminal.Bel : b.Value);
+                    Terminal.Bel = v = (b == TOGGLE ? !Terminal.Bel : b.Value);
                     break;
                 case 2:
-                    Terminal.Flash = v = (b == null ? !Terminal.Flash : b.Value);
+                    Terminal.Flash = v = (b == TOGGLE ? !Terminal.Flash : b.Value);
                     break;
                 case 3:
-                    Terminal.Telnet = v = (b == null ? !Terminal.Telnet : b.Value);
+                    Terminal.Telnet = v = (b == TOGGLE ? !Terminal.Telnet : b.Value);
                     break;
                 case 4:
-                    Terminal.Cls = v = (b == null ? !Terminal.Cls : b.Value);
+                    Terminal.Cls = v = (b == TOGGLE ? !Terminal.Cls : b.Value);
                     break;
                 case 5:
-                    Terminal.BasicBackspace = v = (b == null ? !Terminal.BasicBackspace : b.Value);
+                    Terminal.BasicBackspace = v = (b == TOGGLE ? !Terminal.BasicBackspace : b.Value);
                     break;
                 case 6:
-                    Terminal.Echo = v = (b == null ? !Terminal.Echo : b.Value);
+                    Terminal.Echo = v = (b == TOGGLE ? !Terminal.Echo : b.Value);
                     break;
                 case 8:
-                    Terminal.LF = v = (b == null ? !Terminal.LF : b.Value);
+                    Terminal.LF = v = (b == TOGGLE ? !Terminal.LF : b.Value);
                     break;
                 default:
                 case 7:
@@ -632,7 +630,7 @@ namespace Altair64.Project
         private void Terminal_Option_Clicked(object sender, EventArgs e)
         {
             Label label = (Label)sender;
-            SetTerminalOption(label, null);
+            SetTerminalOption(label, TOGGLE);
         }
 
         private void Examine_Clicked(object sender, EventArgs e)
