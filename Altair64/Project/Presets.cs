@@ -91,12 +91,12 @@ namespace Altair64.Project
 
         private void Controls_Enter(object sender, EventArgs e)
         {
-            ((Control)sender).BackColor = SystemColors.GradientActiveCaption;
+            ((Control)sender).BackColor = LAB_ButtonColors.ForeColor;
         }
 
         private void Controls_Leave(object sender, EventArgs e)
         {
-            ((Control)sender).BackColor = SystemColors.InactiveBorder;
+            ((Control)sender).BackColor = LAB_ButtonColors.BackColor;
         }
 
         private void Controls_Clicked(object sender, EventArgs e)

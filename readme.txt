@@ -1,6 +1,6 @@
-Here is my very untidy Altair 8800 emulator project solution. This was put together with Visual Studio 2022 using .NET 6.0
+Here is my very untidy Altair 8800 emulator project solution. This was put together with Visual Studio 2022 using .NET 6.0. Although .NET 6 will use enforced nullables by default I have disabled this as converting the previous .net framework 4 code to nullables would have been far too much work,  
 
-I am not at all happy with the awful state of the code in this project, but I really do not have the time to get it in a state that doesn't make me cringe. There are almost certainly still bugs and glitches, so don't expect too much. Nothing is code documented either.
+I am not at all happy with the awful state of the code in this project, but I really do not have much free time to get it into a state that doesn't make me cringe. There are almost certainly still bugs and glitches, so don't expect too much. Nothing is code documented either. I am slowly cleaning things up, but this project balooned into a massive one and there's still a lot of work to do in that area and I'm just one guy.
 
 The code (such as it is) is completely public domain and open, so do with it as you will. All I ask is that you don't remove my copyright messages and links to my YouTube channel.
 
@@ -12,5 +12,10 @@ Make sure you build the solution before attempting to open the Form designer bec
 
 There is an odd "Object reference not set to an instance of an object" error that pops up when opening the main UI in the designer. Not sure why that happens but it doesn't seem to cause any issues, just ignore it.
 
-A brief demo of this application is on my YouTube channel
+A brief demo of this application is on my YouTube channel, although this is somewhat outof date now.
 https://www.youtube.com/watch?v=GLT6EjQuxTs
+
+When messing with cassette audio and trying to load in audio data, I have found that setting the hysteresis to a higher value than the default tends to work better. Around 55% for me seems optimal, YMMV.
+
+The core 8080 C++ code doesn't use any Windows APIs (I think) so it should be portable to other platforms easily enough. The 8080 code is static and thus only capable of emulating a single CPU. Objectification for multiple instances is something I am planning, but frankly, I don't see much use case for that.
+

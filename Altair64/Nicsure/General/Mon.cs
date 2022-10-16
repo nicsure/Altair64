@@ -94,6 +94,20 @@ namespace Nicsure.General
             return null;
         }
 
+        public static bool WriteAllText(string file, string text)
+        {
+            try 
+            {
+                File.WriteAllText(file, text);
+            }
+            catch
+            {
+                Err("Unable to write to text file: " + file);
+                return false;
+            }
+            return true;
+        }
+
         public static bool WriteAllBytes(String file, byte[] b)
         {
             try

@@ -79,11 +79,13 @@ namespace Nicsure.Altair8800.Hardware
             clipMenu.Items.Add(new ToolStripMenuItem("Copy", null, null, "0"));
             clipMenu.Items.Add(new ToolStripMenuItem("Paste", null, null, "1"));
             clipMenu.Items.Add(new ToolStripSeparator());
-            clipMenu.Items.Add(new ToolStripMenuItem("Font", null, null, "2"));
+            clipMenu.Items.Add(new ToolStripMenuItem("Font", null, null, "2"));            
             clipMenu.ItemClicked += ClipMenu_ItemClicked;
             ContextMenuStrip = clipMenu;
             if (Telnet) Mon.Run(Listen);
         }
+
+        
 
         private void ClipMenu_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
@@ -98,8 +100,10 @@ namespace Nicsure.Altair8800.Hardware
                     byte[] b = Encoding.ASCII.GetBytes(s ?? String.Empty);
                     Mon.Run(() =>
                     {
-                        foreach (char c in b)
+                        foreach (char c in b.Select(v => (char)v))
+                        {
                             Send(c);
+                        }
                     });
                     break;
                 case 2:
@@ -147,7 +151,7 @@ namespace Nicsure.Altair8800.Hardware
                                 {
                                     int c = telnet.ReadByte();
                                     if (c == -1) break;
-                                    serialDevice.Send(c);
+                                    CharFromUser((char)c);
                                 }
                             }
                             telnet = null;
@@ -177,27 +181,48 @@ namespace Nicsure.Altair8800.Hardware
             termTimer.Interval = termTimer.Interval == 50 ? 51 : 50;
         }
 
+        private void CharFromUser(char c)
+        {
+            if (c == 3 && Irq) Mon.Msg(1, 0);
+            if (c == 8 && BasicBackspace)
+            {
+                Backspace();
+                try
+                {
+                    telnet?.WriteByte(32);
+                    telnet?.WriteByte(8);
+                }
+                catch { }
+                c = '_';
+            }
+            if (c == 13 && LF) c = '\n';
+            serialDevice.Send(c);
+            if (Echo)
+            {
+                try { telnet?.WriteByte((byte)c); } catch { }
+                BumpTermTimer(c);
+                if (c == 13)
+                {
+                    BumpTermTimer('\n');
+                    try { telnet?.WriteByte(10); } catch { }
+                }
+            }
+        }
+
         private void SerialConsole_KeyPress(object sender, KeyPressEventArgs e)
         {
             e.Handled = true;
-            if (e.KeyChar == 3 && Irq) Mon.Msg(1, 0);
-            if (e.KeyChar == 8 && BasicBackspace)
-            {
-                Backspace();
-                e.KeyChar = '_';
-            }
-            if (e.KeyChar == 13 && LF) e.KeyChar = '\n';
-            serialDevice.Send(e.KeyChar);
-            if (Echo)
-            {
-                BumpTermTimer(e.KeyChar);
-                if (e.KeyChar == 13)
-                    BumpTermTimer('\n');
-            }
+            CharFromUser(e.KeyChar);
         }
 
         private void Backspace()
         {
+            try
+            {
+                telnet?.WriteByte(8);
+            }
+            catch { }
+            if (InvokeRequired) return;
             if (termBuf.Length == 0)
             {
                 if (Text.Length > 0)
@@ -225,13 +250,12 @@ namespace Nicsure.Altair8800.Hardware
         {
             Text = "";
             lastChar = 0;
+            try { telnet?.WriteByte(12); } catch { }
         }
 
         private void InvertScreen()
         {
-            Color tmp = BackColor;
-            BackColor = ForeColor;
-            ForeColor = tmp;
+            (ForeColor, BackColor) = (BackColor, ForeColor);
         }
 
         private void BumpTermTimer(char c)
@@ -257,14 +281,6 @@ namespace Nicsure.Altair8800.Hardware
                     captured++;
                 }
             }
-            if (telnet != null)
-            {
-                try
-                {
-                    telnet?.WriteByte((byte)c);
-                }
-                catch (Exception) { }
-            }
             Mon.Invoke(() =>
             {
                 switch (c)
@@ -289,6 +305,7 @@ namespace Nicsure.Altair8800.Hardware
                             BumpTermTimer('\r');
                         BumpTermTimer(Mon.Ascii(c));
                         lastChar = c;
+                        try { telnet?.WriteByte((byte)c); } catch { }
                         break;
                 }
             });

@@ -31,14 +31,15 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.PresetGrid = new System.Windows.Forms.DataGridView();
-            this.AddNew = new System.Windows.Forms.Label();
-            this.AddNewRam = new System.Windows.Forms.Label();
-            this.Delete = new System.Windows.Forms.Label();
-            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.PresetName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Description = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.LoadPreset = new System.Windows.Forms.DataGridViewButtonColumn();
             this.RunPreset = new System.Windows.Forms.DataGridViewButtonColumn();
+            this.AddNew = new System.Windows.Forms.Label();
+            this.AddNewRam = new System.Windows.Forms.Label();
+            this.Delete = new System.Windows.Forms.Label();
+            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.LAB_ButtonColors = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.PresetGrid)).BeginInit();
             this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
@@ -90,11 +91,42 @@
             this.PresetGrid.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.PresetGrid_CellContentClick);
             this.PresetGrid.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.PresetGrid_CellEndEdit);
             // 
+            // PresetName
+            // 
+            this.PresetName.HeaderText = "Preset Name";
+            this.PresetName.MinimumWidth = 8;
+            this.PresetName.Name = "PresetName";
+            this.PresetName.Width = 300;
+            // 
+            // Description
+            // 
+            this.Description.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.Description.HeaderText = "Preset Description";
+            this.Description.MinimumWidth = 8;
+            this.Description.Name = "Description";
+            // 
+            // LoadPreset
+            // 
+            this.LoadPreset.FillWeight = 70F;
+            this.LoadPreset.HeaderText = "Load";
+            this.LoadPreset.MinimumWidth = 8;
+            this.LoadPreset.Name = "LoadPreset";
+            this.LoadPreset.Text = "Load";
+            this.LoadPreset.Width = 90;
+            // 
+            // RunPreset
+            // 
+            this.RunPreset.FillWeight = 70F;
+            this.RunPreset.HeaderText = "Run";
+            this.RunPreset.MinimumWidth = 8;
+            this.RunPreset.Name = "RunPreset";
+            this.RunPreset.Width = 90;
+            // 
             // AddNew
             // 
             this.AddNew.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.AddNew.AutoSize = true;
-            this.AddNew.BackColor = System.Drawing.SystemColors.InactiveBorder;
+            this.AddNew.BackColor = System.Drawing.SystemColors.ActiveBorder;
             this.AddNew.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.AddNew.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.AddNew.Location = new System.Drawing.Point(165, 822);
@@ -113,7 +145,7 @@
             // 
             this.AddNewRam.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.AddNewRam.AutoSize = true;
-            this.AddNewRam.BackColor = System.Drawing.SystemColors.InactiveBorder;
+            this.AddNewRam.BackColor = System.Drawing.SystemColors.ActiveBorder;
             this.AddNewRam.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.AddNewRam.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.AddNewRam.Location = new System.Drawing.Point(502, 822);
@@ -132,7 +164,7 @@
             // 
             this.Delete.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.Delete.AutoSize = true;
-            this.Delete.BackColor = System.Drawing.SystemColors.InactiveBorder;
+            this.Delete.BackColor = System.Drawing.SystemColors.ActiveBorder;
             this.Delete.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.Delete.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.Delete.Location = new System.Drawing.Point(973, 822);
@@ -166,36 +198,17 @@
             this.tableLayoutPanel1.Size = new System.Drawing.Size(1230, 887);
             this.tableLayoutPanel1.TabIndex = 2;
             // 
-            // PresetName
+            // LAB_ButtonColors
             // 
-            this.PresetName.HeaderText = "Preset Name";
-            this.PresetName.MinimumWidth = 8;
-            this.PresetName.Name = "PresetName";
-            this.PresetName.Width = 300;
-            // 
-            // Description
-            // 
-            this.Description.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.Description.HeaderText = "Preset Description";
-            this.Description.MinimumWidth = 8;
-            this.Description.Name = "Description";
-            // 
-            // LoadPreset
-            // 
-            this.LoadPreset.FillWeight = 70F;
-            this.LoadPreset.HeaderText = "Load";
-            this.LoadPreset.MinimumWidth = 8;
-            this.LoadPreset.Name = "LoadPreset";
-            this.LoadPreset.Text = "Load";
-            this.LoadPreset.Width = 90;
-            // 
-            // RunPreset
-            // 
-            this.RunPreset.FillWeight = 70F;
-            this.RunPreset.HeaderText = "Run";
-            this.RunPreset.MinimumWidth = 8;
-            this.RunPreset.Name = "RunPreset";
-            this.RunPreset.Width = 90;
+            this.LAB_ButtonColors.AutoSize = true;
+            this.LAB_ButtonColors.BackColor = System.Drawing.SystemColors.ActiveBorder;
+            this.LAB_ButtonColors.ForeColor = System.Drawing.SystemColors.GradientActiveCaption;
+            this.LAB_ButtonColors.Location = new System.Drawing.Point(1231, 583);
+            this.LAB_ButtonColors.Name = "LAB_ButtonColors";
+            this.LAB_ButtonColors.Size = new System.Drawing.Size(59, 25);
+            this.LAB_ButtonColors.TabIndex = 3;
+            this.LAB_ButtonColors.Text = "label1";
+            this.LAB_ButtonColors.Visible = false;
             // 
             // Presets
             // 
@@ -203,6 +216,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ControlLight;
             this.ClientSize = new System.Drawing.Size(1230, 887);
+            this.Controls.Add(this.LAB_ButtonColors);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Name = "Presets";
             this.Text = "Presets";
@@ -212,6 +226,7 @@
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -226,5 +241,6 @@
         private DataGridViewTextBoxColumn Description;
         private DataGridViewButtonColumn LoadPreset;
         private DataGridViewButtonColumn RunPreset;
+        private Label LAB_ButtonColors;
     }
 }

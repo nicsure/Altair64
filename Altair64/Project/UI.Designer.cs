@@ -61,6 +61,9 @@ namespace Altair64.Project
             this.LAB_Flash = new System.Windows.Forms.Label();
             this.LAB_Bel = new System.Windows.Forms.Label();
             this.LAB_Irq = new System.Windows.Forms.Label();
+            this.LAB_Putty = new System.Windows.Forms.Label();
+            this.CMS_Putty = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.setPuTTYexeLocationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.Terminal = new Nicsure.Altair8800.Hardware.SerialConsole();
             this.tableLayoutPanel5 = new System.Windows.Forms.TableLayoutPanel();
             this.CB_ZF = new System.Windows.Forms.CheckBox();
@@ -224,6 +227,7 @@ namespace Altair64.Project
             this.CMS_DiskOptions.SuspendLayout();
             this.panel1.SuspendLayout();
             this.TLP_TerminalOptions.SuspendLayout();
+            this.CMS_Putty.SuspendLayout();
             this.tableLayoutPanel5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NUD_IV)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUD_SP)).BeginInit();
@@ -481,17 +485,19 @@ namespace Altair64.Project
             // 
             // TLP_TerminalOptions
             // 
-            this.TLP_TerminalOptions.ColumnCount = 9;
-            this.TLP_TerminalOptions.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
-            this.TLP_TerminalOptions.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
-            this.TLP_TerminalOptions.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
-            this.TLP_TerminalOptions.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
-            this.TLP_TerminalOptions.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
-            this.TLP_TerminalOptions.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
-            this.TLP_TerminalOptions.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
-            this.TLP_TerminalOptions.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
-            this.TLP_TerminalOptions.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.11111F));
-            this.TLP_TerminalOptions.Controls.Add(this.LAB_Clear, 8, 0);
+            this.TLP_TerminalOptions.BackColor = System.Drawing.Color.Black;
+            this.TLP_TerminalOptions.ColumnCount = 10;
+            this.TLP_TerminalOptions.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10.0001F));
+            this.TLP_TerminalOptions.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10.0001F));
+            this.TLP_TerminalOptions.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10.0001F));
+            this.TLP_TerminalOptions.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10.0001F));
+            this.TLP_TerminalOptions.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10.0001F));
+            this.TLP_TerminalOptions.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10.0001F));
+            this.TLP_TerminalOptions.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10.0001F));
+            this.TLP_TerminalOptions.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10.0001F));
+            this.TLP_TerminalOptions.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10.0001F));
+            this.TLP_TerminalOptions.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 9.999101F));
+            this.TLP_TerminalOptions.Controls.Add(this.LAB_Clear, 9, 0);
             this.TLP_TerminalOptions.Controls.Add(this.LAB_LF, 7, 0);
             this.TLP_TerminalOptions.Controls.Add(this.LAB_Echo, 6, 0);
             this.TLP_TerminalOptions.Controls.Add(this.LAB_BasicBackspace, 5, 0);
@@ -500,12 +506,12 @@ namespace Altair64.Project
             this.TLP_TerminalOptions.Controls.Add(this.LAB_Flash, 2, 0);
             this.TLP_TerminalOptions.Controls.Add(this.LAB_Bel, 1, 0);
             this.TLP_TerminalOptions.Controls.Add(this.LAB_Irq, 0, 0);
+            this.TLP_TerminalOptions.Controls.Add(this.LAB_Putty, 8, 0);
             this.TLP_TerminalOptions.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.TLP_TerminalOptions.Location = new System.Drawing.Point(0, 1049);
             this.TLP_TerminalOptions.Name = "TLP_TerminalOptions";
             this.TLP_TerminalOptions.RowCount = 1;
             this.TLP_TerminalOptions.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.TLP_TerminalOptions.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.TLP_TerminalOptions.Size = new System.Drawing.Size(1409, 49);
             this.TLP_TerminalOptions.TabIndex = 40;
             // 
@@ -517,7 +523,7 @@ namespace Altair64.Project
             this.LAB_Clear.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.LAB_Clear.Font = new System.Drawing.Font("Lucida Console", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.LAB_Clear.ForeColor = System.Drawing.Color.DarkOrange;
-            this.LAB_Clear.Location = new System.Drawing.Point(1286, 12);
+            this.LAB_Clear.Location = new System.Drawing.Point(1292, 12);
             this.LAB_Clear.Margin = new System.Windows.Forms.Padding(0);
             this.LAB_Clear.Name = "LAB_Clear";
             this.LAB_Clear.Size = new System.Drawing.Size(85, 24);
@@ -534,7 +540,7 @@ namespace Altair64.Project
             this.LAB_LF.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.LAB_LF.Font = new System.Drawing.Font("Lucida Console", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.LAB_LF.ForeColor = System.Drawing.Color.DarkOrange;
-            this.LAB_LF.Location = new System.Drawing.Point(1150, 12);
+            this.LAB_LF.Location = new System.Drawing.Point(1030, 12);
             this.LAB_LF.Margin = new System.Windows.Forms.Padding(0);
             this.LAB_LF.Name = "LAB_LF";
             this.LAB_LF.Size = new System.Drawing.Size(40, 24);
@@ -551,7 +557,7 @@ namespace Altair64.Project
             this.LAB_Echo.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.LAB_Echo.Font = new System.Drawing.Font("Lucida Console", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.LAB_Echo.ForeColor = System.Drawing.Color.DarkOrange;
-            this.LAB_Echo.Location = new System.Drawing.Point(964, 12);
+            this.LAB_Echo.Location = new System.Drawing.Point(860, 12);
             this.LAB_Echo.Margin = new System.Windows.Forms.Padding(0);
             this.LAB_Echo.Name = "LAB_Echo";
             this.LAB_Echo.Size = new System.Drawing.Size(100, 24);
@@ -568,7 +574,7 @@ namespace Altair64.Project
             this.LAB_BasicBackspace.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.LAB_BasicBackspace.Font = new System.Drawing.Font("Lucida Console", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.LAB_BasicBackspace.ForeColor = System.Drawing.Color.DarkOrange;
-            this.LAB_BasicBackspace.Location = new System.Drawing.Point(823, 12);
+            this.LAB_BasicBackspace.Location = new System.Drawing.Point(735, 12);
             this.LAB_BasicBackspace.Margin = new System.Windows.Forms.Padding(0);
             this.LAB_BasicBackspace.Name = "LAB_BasicBackspace";
             this.LAB_BasicBackspace.Size = new System.Drawing.Size(70, 24);
@@ -585,7 +591,7 @@ namespace Altair64.Project
             this.LAB_Cls.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.LAB_Cls.Font = new System.Drawing.Font("Lucida Console", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.LAB_Cls.ForeColor = System.Drawing.Color.Black;
-            this.LAB_Cls.Location = new System.Drawing.Point(659, 12);
+            this.LAB_Cls.Location = new System.Drawing.Point(587, 12);
             this.LAB_Cls.Margin = new System.Windows.Forms.Padding(0);
             this.LAB_Cls.Name = "LAB_Cls";
             this.LAB_Cls.Size = new System.Drawing.Size(85, 24);
@@ -602,7 +608,7 @@ namespace Altair64.Project
             this.LAB_Telnet.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.LAB_Telnet.Font = new System.Drawing.Font("Lucida Console", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.LAB_Telnet.ForeColor = System.Drawing.Color.Black;
-            this.LAB_Telnet.Location = new System.Drawing.Point(481, 12);
+            this.LAB_Telnet.Location = new System.Drawing.Point(425, 12);
             this.LAB_Telnet.Margin = new System.Windows.Forms.Padding(0);
             this.LAB_Telnet.Name = "LAB_Telnet";
             this.LAB_Telnet.Size = new System.Drawing.Size(130, 24);
@@ -619,7 +625,7 @@ namespace Altair64.Project
             this.LAB_Flash.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.LAB_Flash.Font = new System.Drawing.Font("Lucida Console", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.LAB_Flash.ForeColor = System.Drawing.Color.Black;
-            this.LAB_Flash.Location = new System.Drawing.Point(332, 12);
+            this.LAB_Flash.Location = new System.Drawing.Point(292, 12);
             this.LAB_Flash.Margin = new System.Windows.Forms.Padding(0);
             this.LAB_Flash.Name = "LAB_Flash";
             this.LAB_Flash.Size = new System.Drawing.Size(115, 24);
@@ -636,7 +642,7 @@ namespace Altair64.Project
             this.LAB_Bel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.LAB_Bel.Font = new System.Drawing.Font("Lucida Console", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.LAB_Bel.ForeColor = System.Drawing.Color.Black;
-            this.LAB_Bel.Location = new System.Drawing.Point(191, 12);
+            this.LAB_Bel.Location = new System.Drawing.Point(167, 12);
             this.LAB_Bel.Margin = new System.Windows.Forms.Padding(0);
             this.LAB_Bel.Name = "LAB_Bel";
             this.LAB_Bel.Size = new System.Drawing.Size(85, 24);
@@ -653,7 +659,7 @@ namespace Altair64.Project
             this.LAB_Irq.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.LAB_Irq.Font = new System.Drawing.Font("Lucida Console", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.LAB_Irq.ForeColor = System.Drawing.Color.DarkOrange;
-            this.LAB_Irq.Location = new System.Drawing.Point(35, 12);
+            this.LAB_Irq.Location = new System.Drawing.Point(27, 12);
             this.LAB_Irq.Margin = new System.Windows.Forms.Padding(0);
             this.LAB_Irq.Name = "LAB_Irq";
             this.LAB_Irq.Size = new System.Drawing.Size(85, 24);
@@ -661,6 +667,39 @@ namespace Altair64.Project
             this.LAB_Irq.Tag = "0";
             this.LAB_Irq.Text = "CTL-C";
             this.LAB_Irq.Click += new System.EventHandler(this.Terminal_Option_Clicked);
+            // 
+            // LAB_Putty
+            // 
+            this.LAB_Putty.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.LAB_Putty.AutoSize = true;
+            this.LAB_Putty.BackColor = System.Drawing.Color.Black;
+            this.LAB_Putty.ContextMenuStrip = this.CMS_Putty;
+            this.LAB_Putty.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.LAB_Putty.Font = new System.Drawing.Font("Lucida Console", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.LAB_Putty.ForeColor = System.Drawing.Color.DarkOrange;
+            this.LAB_Putty.Location = new System.Drawing.Point(1147, 12);
+            this.LAB_Putty.Margin = new System.Windows.Forms.Padding(0);
+            this.LAB_Putty.Name = "LAB_Putty";
+            this.LAB_Putty.Size = new System.Drawing.Size(85, 24);
+            this.LAB_Putty.TabIndex = 8;
+            this.LAB_Putty.Tag = "9";
+            this.LAB_Putty.Text = "PuTTY";
+            this.LAB_Putty.Click += new System.EventHandler(this.Terminal_Option_Clicked);
+            // 
+            // CMS_Putty
+            // 
+            this.CMS_Putty.ImageScalingSize = new System.Drawing.Size(24, 24);
+            this.CMS_Putty.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.setPuTTYexeLocationToolStripMenuItem});
+            this.CMS_Putty.Name = "CMS_Putty";
+            this.CMS_Putty.Size = new System.Drawing.Size(241, 69);
+            // 
+            // setPuTTYexeLocationToolStripMenuItem
+            // 
+            this.setPuTTYexeLocationToolStripMenuItem.Name = "setPuTTYexeLocationToolStripMenuItem";
+            this.setPuTTYexeLocationToolStripMenuItem.Size = new System.Drawing.Size(240, 32);
+            this.setPuTTYexeLocationToolStripMenuItem.Text = "Set PuTTY Options";
+            this.setPuTTYexeLocationToolStripMenuItem.Click += new System.EventHandler(this.PuttyMenu_Click);
             // 
             // Terminal
             // 
@@ -678,13 +717,13 @@ namespace Altair64.Project
             this.Terminal.ForeColor = System.Drawing.Color.LawnGreen;
             this.Terminal.Irq = false;
             this.Terminal.LF = false;
-            this.Terminal.Location = new System.Drawing.Point(13, 15);
-            this.Terminal.Margin = new System.Windows.Forms.Padding(6, 7, 6, 7);
+            this.Terminal.Location = new System.Drawing.Point(0, 0);
+            this.Terminal.Margin = new System.Windows.Forms.Padding(0);
             this.Terminal.MaxLength = 3000;
             this.Terminal.Multiline = true;
             this.Terminal.Name = "Terminal";
             this.Terminal.ReadOnly = true;
-            this.Terminal.Size = new System.Drawing.Size(1381, 1024);
+            this.Terminal.Size = new System.Drawing.Size(1408, 1046);
             this.Terminal.TabIndex = 23;
             this.Terminal.Telnet = true;
             // 
@@ -3529,6 +3568,7 @@ namespace Altair64.Project
             this.Text = "Altair 8800 - (C) 2022 by nicsure";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.UI_FormClosing);
             this.Shown += new System.EventHandler(this.UI_Shown);
+            this.ResizeEnd += new System.EventHandler(this.UI_ResizeEnd);
             ((System.ComponentModel.ISupportInitialize)(this.NUD_BinLoadAddr)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUD_PC)).EndInit();
             this.CMS_DiskOptions.ResumeLayout(false);
@@ -3536,6 +3576,7 @@ namespace Altair64.Project
             this.panel1.PerformLayout();
             this.TLP_TerminalOptions.ResumeLayout(false);
             this.TLP_TerminalOptions.PerformLayout();
+            this.CMS_Putty.ResumeLayout(false);
             this.tableLayoutPanel5.ResumeLayout(false);
             this.tableLayoutPanel5.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NUD_IV)).EndInit();
@@ -3790,6 +3831,9 @@ namespace Altair64.Project
         private Label LAB_Ref;
         private TableLayoutPanel tableLayoutPanel4;
         private TableLayoutPanel tableLayoutPanel5;
+        private Label LAB_Putty;
+        private ContextMenuStrip CMS_Putty;
+        private ToolStripMenuItem setPuTTYexeLocationToolStripMenuItem;
     }
 }
 

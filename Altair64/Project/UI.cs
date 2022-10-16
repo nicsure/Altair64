@@ -8,6 +8,7 @@ using Nicsure.General;
 using Nicsure.Intel8080;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Runtime.Intrinsics.Arm;
 using static System.Windows.Forms.AxHost;
 
@@ -17,6 +18,38 @@ namespace Altair64.Project
     {
         // Code by nicsure (C)2022
         // https://www.youtube.com/nicsure
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
+
+        [DllImport("USER32.DLL")]
+        private static extern long SetWindowLong(IntPtr hWnd, int nIndex, long dwNewLong);
+
+        [DllImport("USER32.DLL")]
+        private static extern long GetWindowLong(IntPtr hWnd, int nIndex);
+
+        [DllImport("USER32.DLL")]
+        private static extern long SetWindowPos(IntPtr hWnd, IntPtr hWndIA, int x, int y, int cx, int cy, uint uFlags);
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+        
+        [DllImport("user32.dll")]
+        static extern bool EnumThreadWindows(int dwThreadId, EnumCallback lpfn, IntPtr lParam);
+
+        delegate bool EnumCallback(IntPtr hWnd, IntPtr lParam);
+
+        private const int GWL_STYLE = -16;
+        private const int GWL_EXSTYLE = -20;
+        private const long WS_SYSMENU = 0x00080000L;
+        private const long WS_CAPTION = 0x00C00000L;
+        private const long WS_THICKFRAME = 0x00040000L;
+        private const long WS_MINIMIZEBOX = 0x00020000L;
+        private const long WS_MAXIMIZEBOX = 0x00010000L;
+        private const int SW_MAXIMIZE = 3;
+        private const int SW_MINIMIZE = 6;
+        private const int WS_EX_DLGMODALFRAME = 0x1;
 
         private static readonly bool? TOGGLE = null;
         private static readonly byte[] NOSTATE = null;
@@ -530,9 +563,9 @@ namespace Altair64.Project
 
         }
 
-        private String[] OpenFiles(String title, params String[] ext) => OpenOrSaveFile(title, false, ext, true);
-        private String OpenFile(String title, params String[] ext) => OpenOrSaveFile(title, false, ext)[0];
-        private String SaveFile(String title, params String[] ext) => OpenOrSaveFile(title, true, ext)[0];
+        public static String[] OpenFiles(String title, params String[] ext) => ui.OpenOrSaveFile(title, false, ext, true);
+        public static String OpenFile(String title, params String[] ext) => ui.OpenOrSaveFile(title, false, ext)[0];
+        public static String SaveFile(String title, params String[] ext) => ui.OpenOrSaveFile(title, true, ext)[0];
 
         private String[] OpenOrSaveFile(String title, bool save, String[] ext, bool multi = false)
         {
@@ -588,6 +621,65 @@ namespace Altair64.Project
             Altair8800.SetSwitch(swNum, sw.Checked);
         }
 
+        private static List<IntPtr> GetWindowHandles(Process process)
+        {
+            List<IntPtr> handles = new();
+            foreach (ProcessThread thread in process.Threads)
+                EnumThreadWindows(
+                    thread.Id,
+                    (hWnd, lParam) =>
+                    {
+                        handles.Add(hWnd);
+                        return true;
+                    },
+                    IntPtr.Zero);
+            return handles;
+        }
+
+
+        private async void StartPutty()
+        {
+            Terminal.Top -= PuttyOptions.TitleHeight;
+            try
+            {
+                using (Process puttyProc = new())
+                {
+                    puttyProc.StartInfo.FileName = PuttyOptions.Path;
+                    puttyProc.StartInfo.Arguments = "-load \"" + PuttyOptions.Session + "\"";
+                    puttyProc.Start();
+                    if (!puttyProc.HasExited)
+                    {                        
+                        puttyProc.WaitForInputIdle();
+                        PuttyOptions.Window = GetWindowHandles(puttyProc)[0];
+                        SetParent(PuttyOptions.Window, Terminal.Handle);
+                        long gw = GetWindowLong(PuttyOptions.Window, GWL_STYLE);
+                        gw &= ~WS_CAPTION;
+                        gw &= ~WS_SYSMENU;
+                        gw &= ~WS_THICKFRAME;
+                        gw &= ~WS_MINIMIZEBOX;
+                        gw &= ~WS_MAXIMIZEBOX;
+                        SetWindowLong(PuttyOptions.Window, GWL_STYLE, gw);
+                        long gwx = GetWindowLong(PuttyOptions.Window, GWL_EXSTYLE);
+                        gwx |= WS_EX_DLGMODALFRAME;
+                        SetWindowLong(PuttyOptions.Window, GWL_EXSTYLE, gwx);
+                        SetWindowPos(PuttyOptions.Window, (IntPtr)0, 0, 0, 100, 100, 0x40);
+                        ShowWindow(PuttyOptions.Window, SW_MAXIMIZE);
+                        PuttyOptions.Proc = puttyProc;                        
+                        await puttyProc.WaitForExitAsync();
+                    }
+                }
+            }            
+            catch { Mon.Err("Putty Broked"); }
+            PuttyOptions.Proc = null;
+            SetTerminalOption(LAB_Putty, false);
+            Terminal.Top += PuttyOptions.TitleHeight;
+        }
+
+        private static void StopPutty()
+        {
+            try { PuttyOptions.Proc?.Kill(); } catch { }
+        }
+
         private void SetTerminalOption(Label label, bool? b) // b==null = Toggle
         {
             int i = Convert.ToInt32(label.Tag);
@@ -617,6 +709,20 @@ namespace Altair64.Project
                     break;
                 case 8:
                     Terminal.LF = v = (b == TOGGLE ? !Terminal.LF : b.Value);
+                    break;
+                case 9:
+                    bool nup = v = (b == TOGGLE ? !PuttyOptions.InUse : b.Value);
+                    if (nup != PuttyOptions.InUse)
+                    {
+                        PuttyOptions.InUse = nup;
+                        if (PuttyOptions.InUse)
+                        {
+                            SetTerminalOption(LAB_Telnet, true);
+                            StartPutty();
+                        }
+                        else
+                            StopPutty();
+                    }                    
                     break;
                 default:
                 case 7:
@@ -802,6 +908,21 @@ namespace Altair64.Project
             }
             else
                 Mon.Wrn("Must be in stopped state to access Presets.");
+        }
+
+        private void PuttyMenu_Click(object sender, EventArgs e)
+        {
+            PuttyOptions popts = new();
+            popts.ShowDialog();
+        }
+
+        private void UI_ResizeEnd(object sender, EventArgs e)
+        {            
+            if (PuttyOptions.Proc != null)
+            {
+                ShowWindow(PuttyOptions.Window, SW_MINIMIZE);
+                ShowWindow(PuttyOptions.Window, SW_MAXIMIZE);
+            }
         }
     }
 
