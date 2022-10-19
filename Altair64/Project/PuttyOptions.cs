@@ -14,6 +14,8 @@ namespace Altair64.Project
 {
     public partial class PuttyOptions : Form
     {
+        private const char sep = '\u002C';
+
         private const string defaultsFile = "default.putty";
         public static bool InUse { get; set; } = false;
         public static IntPtr Window { get; set; } = IntPtr.Zero;
@@ -21,6 +23,7 @@ namespace Altair64.Project
         public static string Path { get; private set; } = @"C:\Program Files\PuTTY\putty.exe";
         public static string Session { get; private set; } = "Altair8800";
         public static int TitleHeight { get; private set; } = 50;
+        public static int TelnetPort { get; private set; } = 7870;
 
         static PuttyOptions()
         {
@@ -44,6 +47,7 @@ namespace Altair64.Project
             TBOX_Path.Text = Path;
             TBOX_Session.Text = Session;
             NUD_TitleBarHeight.Value = TitleHeight;
+            NUD_TelnetPort.Value = TelnetPort;
         }
 
         private void ApplyCurrent()
@@ -51,6 +55,7 @@ namespace Altair64.Project
             Path = TBOX_Path.Text;
             Session = TBOX_Session.Text;
             TitleHeight = (int)NUD_TitleBarHeight.Value;
+            TelnetPort = (int)NUD_TelnetPort.Value;
         }
 
         private void SaveDefaults()
@@ -70,23 +75,39 @@ namespace Altair64.Project
 
         public override string ToString()
         {
-            return Path + "," + Session + "," + TitleHeight;
+            return Path + sep + Session + sep + TitleHeight + sep + TelnetPort;
         }
 
         public static void FromString(string s)
         {
-            string[] p = s.Split('\u002C');
-            if (p.Length == 3)
+            string[] p = s.Split(sep);
+            for (int i = 0; i < p.Length; i++)
             {
-                Path = p[0];
-                Session = p[1];
-                if (int.TryParse(p[2], out int th)) TitleHeight = th;
+                switch (i)
+                {
+                    case 0:
+                        Path = p[0];
+                        break;
+                    case 1:
+                        Session = p[1];
+                        break;
+                    case 2:
+                        if (int.TryParse(p[2], out int th)) TitleHeight = th;
+                        break;
+                    case 3:
+                        if (int.TryParse(p[3], out int tp)) TelnetPort = tp;
+                        break;
+                    default:
+                        return;
+                }
             }
         }
 
         private void BUT_Default_Click(object sender, EventArgs e)
         {
+            ApplyCurrent();
             SaveDefaults();
+            Close();
         }
 
         private void BUT_Cancel_Click(object sender, EventArgs e)

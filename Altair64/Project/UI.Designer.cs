@@ -605,6 +605,7 @@ namespace Altair64.Project
             this.LAB_Telnet.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.LAB_Telnet.AutoSize = true;
             this.LAB_Telnet.BackColor = System.Drawing.Color.DarkOrange;
+            this.LAB_Telnet.ContextMenuStrip = this.CMS_Putty;
             this.LAB_Telnet.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.LAB_Telnet.Font = new System.Drawing.Font("Lucida Console", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.LAB_Telnet.ForeColor = System.Drawing.Color.Black;
@@ -692,13 +693,13 @@ namespace Altair64.Project
             this.CMS_Putty.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.setPuTTYexeLocationToolStripMenuItem});
             this.CMS_Putty.Name = "CMS_Putty";
-            this.CMS_Putty.Size = new System.Drawing.Size(232, 36);
+            this.CMS_Putty.Size = new System.Drawing.Size(254, 69);
             // 
             // setPuTTYexeLocationToolStripMenuItem
             // 
             this.setPuTTYexeLocationToolStripMenuItem.Name = "setPuTTYexeLocationToolStripMenuItem";
-            this.setPuTTYexeLocationToolStripMenuItem.Size = new System.Drawing.Size(231, 32);
-            this.setPuTTYexeLocationToolStripMenuItem.Text = "Set PuTTY Options";
+            this.setPuTTYexeLocationToolStripMenuItem.Size = new System.Drawing.Size(253, 32);
+            this.setPuTTYexeLocationToolStripMenuItem.Text = "PuTTY/Telnet Options";
             this.setPuTTYexeLocationToolStripMenuItem.Click += new System.EventHandler(this.PuttyMenu_Click);
             // 
             // Terminal

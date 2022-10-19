@@ -20,7 +20,11 @@ When messing with cassette audio and trying to load in audio data, I have found 
 The core 8080 C++ code doesn't use any Windows APIs (I think) so it should be portable to other platforms easily enough. The 8080 code is static and thus only capable of emulating a single CPU. Objectification for multiple instances is something I am planning, but frankly, I don't see much use case for that.
 
 PuTTY embedding is implemented but is very sketchy atm. Right clicking the PUTTY option in the terminal window will allow you to mess with the settings. PuTTY must be configured with a specific saved session for use with the emulator. The default name is "Altair8800" but this can be changed in the settings. The "PuTTY TitleBar Height" option in the settings is a bit of cludge. Since there's no apparent way to surpress the PuTTY window's title bar, this setting moves the top of the terminal window up by some amount in order to hide the title bar. Depending on your system's theme, DPI and scaling settings, this value may need to be tweaked.
-Recommended Settings for PuTTY session are:
+Recommended (and default) Settings for the PuTTY session are:
+Saved Session > Altair8800
+Connection type > Raw
+Host Name (or IP address) > 127.0.0.1
+Port > 7870
 Terminal > Local Echo = Force Off
 Terminal > Local Line Editing = Force Off
 Terminal > Keyboard > The Backspace Key = Control H

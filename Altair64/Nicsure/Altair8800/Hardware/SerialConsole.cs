@@ -26,6 +26,7 @@ namespace Nicsure.Altair8800.Hardware
         private int captured;
         private bool shutDown = false, telnetEnabled = true;
 
+        public int TelnetPort { get; set; } = 7870;
         public int ControlPort { get; } = 16;
         public int DataPort { get; } = 17;
         public String DeviceName { get; }
@@ -136,10 +137,14 @@ namespace Nicsure.Altair8800.Hardware
         {
             try
             {
-                listener = new TcpListener(IPAddress.Loopback, 7870);
+                listener = new TcpListener(IPAddress.Loopback, TelnetPort);
                 listener.Start();
             }
-            catch { return; }
+            catch
+            {
+                Mon.Err("Unable to start Telnet server on port " + TelnetPort);
+                return;
+            }
             while (!shutDown & Telnet)
             {
                 telnet = null;

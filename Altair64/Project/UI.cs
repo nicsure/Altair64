@@ -179,6 +179,7 @@ namespace Altair64.Project
 
         private void Init()
         {
+            Terminal.TelnetPort = PuttyOptions.TelnetPort;
             Mon.Invoker = this;
             addressLEDs = new IPWM[] { LEDa0, LEDa1, LEDa2, LEDa3 , LEDa4, LEDa5, LEDa6, LEDa7, LEDa8, LEDa9, LEDa10, LEDa11, LEDa12, LEDa13, LEDa14, LEDa15 };
             dataLEDs = new IPWM[] { LEDd0, LEDd1, LEDd2, LEDd3, LEDd4, LEDd5, LEDd6, LEDd7 };
@@ -914,6 +915,7 @@ namespace Altair64.Project
         {
             PuttyOptions popts = new();
             popts.ShowDialog();
+            Terminal.TelnetPort = PuttyOptions.TelnetPort;
         }
 
         private void UI_ResizeEnd(object sender, EventArgs e)

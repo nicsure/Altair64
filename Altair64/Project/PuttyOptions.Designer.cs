@@ -39,8 +39,11 @@
             this.BUT_Cancel = new System.Windows.Forms.Button();
             this.BUT_Default = new System.Windows.Forms.Button();
             this.BUT_OK = new System.Windows.Forms.Button();
+            this.label4 = new System.Windows.Forms.Label();
+            this.NUD_TelnetPort = new System.Windows.Forms.NumericUpDown();
             this.tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NUD_TitleBarHeight)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.NUD_TelnetPort)).BeginInit();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -56,18 +59,21 @@
             this.tableLayoutPanel1.Controls.Add(this.TBOX_Session, 1, 1);
             this.tableLayoutPanel1.Controls.Add(this.label3, 0, 2);
             this.tableLayoutPanel1.Controls.Add(this.NUD_TitleBarHeight, 1, 2);
-            this.tableLayoutPanel1.Controls.Add(this.BUT_Cancel, 0, 3);
-            this.tableLayoutPanel1.Controls.Add(this.BUT_Default, 1, 3);
-            this.tableLayoutPanel1.Controls.Add(this.BUT_OK, 2, 3);
+            this.tableLayoutPanel1.Controls.Add(this.BUT_Cancel, 0, 4);
+            this.tableLayoutPanel1.Controls.Add(this.BUT_Default, 1, 4);
+            this.tableLayoutPanel1.Controls.Add(this.BUT_OK, 2, 4);
+            this.tableLayoutPanel1.Controls.Add(this.label4, 0, 3);
+            this.tableLayoutPanel1.Controls.Add(this.NUD_TelnetPort, 1, 3);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 4;
+            this.tableLayoutPanel1.RowCount = 5;
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(879, 188);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(879, 253);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
             // label1
@@ -161,7 +167,7 @@
             // BUT_Cancel
             // 
             this.BUT_Cancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.BUT_Cancel.Location = new System.Drawing.Point(10, 144);
+            this.BUT_Cancel.Location = new System.Drawing.Point(10, 209);
             this.BUT_Cancel.Margin = new System.Windows.Forms.Padding(10, 0, 0, 10);
             this.BUT_Cancel.Name = "BUT_Cancel";
             this.BUT_Cancel.Size = new System.Drawing.Size(112, 34);
@@ -173,7 +179,7 @@
             // BUT_Default
             // 
             this.BUT_Default.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.BUT_Default.Location = new System.Drawing.Point(263, 144);
+            this.BUT_Default.Location = new System.Drawing.Point(263, 209);
             this.BUT_Default.Margin = new System.Windows.Forms.Padding(0, 0, 0, 10);
             this.BUT_Default.Name = "BUT_Default";
             this.BUT_Default.Size = new System.Drawing.Size(167, 34);
@@ -185,7 +191,7 @@
             // BUT_OK
             // 
             this.BUT_OK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.BUT_OK.Location = new System.Drawing.Point(757, 144);
+            this.BUT_OK.Location = new System.Drawing.Point(757, 209);
             this.BUT_OK.Margin = new System.Windows.Forms.Padding(0, 0, 10, 10);
             this.BUT_OK.Name = "BUT_OK";
             this.BUT_OK.Size = new System.Drawing.Size(112, 34);
@@ -194,12 +200,49 @@
             this.BUT_OK.UseVisualStyleBackColor = true;
             this.BUT_OK.Click += new System.EventHandler(this.BUT_OK_Click);
             // 
+            // label4
+            // 
+            this.label4.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(84, 141);
+            this.label4.Margin = new System.Windows.Forms.Padding(0);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(94, 25);
+            this.label4.TabIndex = 0;
+            this.label4.Text = "Telnet Port";
+            // 
+            // NUD_TelnetPort
+            // 
+            this.NUD_TelnetPort.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.NUD_TelnetPort.BackColor = System.Drawing.SystemColors.Control;
+            this.NUD_TelnetPort.Location = new System.Drawing.Point(263, 133);
+            this.NUD_TelnetPort.Margin = new System.Windows.Forms.Padding(0, 0, 0, 10);
+            this.NUD_TelnetPort.Maximum = new decimal(new int[] {
+            65535,
+            0,
+            0,
+            0});
+            this.NUD_TelnetPort.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.NUD_TelnetPort.Name = "NUD_TelnetPort";
+            this.NUD_TelnetPort.Size = new System.Drawing.Size(98, 31);
+            this.NUD_TelnetPort.TabIndex = 3;
+            this.NUD_TelnetPort.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.NUD_TelnetPort.Value = new decimal(new int[] {
+            7870,
+            0,
+            0,
+            0});
+            // 
             // PuttyOptions
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.ClientSize = new System.Drawing.Size(879, 188);
+            this.ClientSize = new System.Drawing.Size(879, 253);
             this.Controls.Add(this.tableLayoutPanel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "PuttyOptions";
@@ -208,6 +251,7 @@
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NUD_TitleBarHeight)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.NUD_TelnetPort)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -225,5 +269,7 @@
         private Button BUT_Cancel;
         private Button BUT_Default;
         private Button BUT_OK;
+        private Label label4;
+        private NumericUpDown NUD_TelnetPort;
     }
 }
