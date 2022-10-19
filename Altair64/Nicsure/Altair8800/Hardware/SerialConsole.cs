@@ -2,6 +2,7 @@
 using Nicsure.General;
 using Nicsure.Intel8080;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Media;
 using System.Net;
 using System.Net.Sockets;
@@ -15,7 +16,7 @@ namespace Nicsure.Altair8800.Hardware
         // https://www.youtube.com/nicsure
 
         private SerialController serialDevice;
-        private System.Windows.Forms.Timer termTimer;
+        private System.Windows.Forms.Timer displayTimer;
         private String termBuf = String.Empty;
 
         private TcpListener listener;
@@ -69,11 +70,11 @@ namespace Nicsure.Altair8800.Hardware
         { 
             if (LicenseManager.UsageMode == LicenseUsageMode.Designtime || DesignMode)
                 return;
-
+            
             KeyPress += SerialConsole_KeyPress;
-            termTimer = new System.Windows.Forms.Timer();
-            termTimer.Tick += TermTimer_Tick;
-            ToggleInterval();
+            displayTimer = new System.Windows.Forms.Timer();
+            displayTimer.Tick += DisplayTimer_Tick;
+            displayTimer.Interval = 60;
             serialDevice = new SerialController(SerialCardType.SIO2, ControlPort, DataPort, CallBack);
             ContextMenuStrip clipMenu = new ();
             clipMenu.Items.Add(new ToolStripMenuItem("Copy", null, null, "0"));
@@ -133,35 +134,35 @@ namespace Nicsure.Altair8800.Hardware
 
         private void Listen()
         {
-            while (!shutDown && Telnet)
+            try
             {
+                listener = new TcpListener(IPAddress.Loopback, 7870);
+                listener.Start();
+            }
+            catch { return; }
+            while (!shutDown & Telnet)
+            {
+                telnet = null;
                 try
                 {
-                    listener = new TcpListener(IPAddress.Loopback, 7870);
-                    listener.Start();
-                    while (!shutDown & Telnet)
+                    using (client = listener.AcceptTcpClient())
                     {
-                        using (client = listener.AcceptTcpClient())
+                        using (telnet = client.GetStream())
                         {
-                            using (telnet = client.GetStream())
+                            byte[] b = Encoding.ASCII.GetBytes(Text);
+                            telnet.Write(b, 0, b.Length);
+                            while (!shutDown & Telnet)
                             {
-                                byte[] b = Encoding.ASCII.GetBytes(Text);
-                                telnet.Write(b, 0, b.Length);
-                                while (!shutDown & Telnet)
-                                {
-                                    int c = telnet.ReadByte();
-                                    if (c == -1) break;
-                                    CharFromUser((char)c);
-                                }
+                                int c = telnet.ReadByte();
+                                if (c == -1) break;
+                                CharFromUser((char)c);
                             }
-                            telnet = null;
                         }
                     }
                 }
-                catch (Exception e) { Mon.Err(e.ToString()); Thread.Sleep(500); }
-                Mon.KillListener(listener);
+                catch { }
             }
-            telnet = null;
+            Mon.KillListener(listener);
         }
 
         private void Append(String s)
@@ -169,16 +170,17 @@ namespace Nicsure.Altair8800.Hardware
             Mon.Invoke(() => AppendText(s));
         }
 
-        private void TermTimer_Tick(object sender, EventArgs e)
+        private void DisplayTimer_Tick(object sender, EventArgs e)
         {
-            if (termTimer.Enabled) termTimer.Stop();
-            Append(termBuf);
-            termBuf = String.Empty;
-        }
-
-        private void ToggleInterval()
-        {
-            termTimer.Interval = termTimer.Interval == 50 ? 51 : 50;
+            lock(this)
+            {
+                if (termBuf.Length > 0)
+                {
+                    Append(termBuf);
+                    termBuf = String.Empty;
+                }
+                displayTimer.Stop();
+            }
         }
 
         private void CharFromUser(char c)
@@ -199,13 +201,9 @@ namespace Nicsure.Altair8800.Hardware
             serialDevice.Send(c);
             if (Echo)
             {
-                try { telnet?.WriteByte((byte)c); } catch { }
-                BumpTermTimer(c);
+                ShowChar(c);
                 if (c == 13)
-                {
-                    BumpTermTimer('\n');
-                    try { telnet?.WriteByte(10); } catch { }
-                }
+                    ShowChar('\n');
             }
         }
 
@@ -258,16 +256,15 @@ namespace Nicsure.Altair8800.Hardware
             (ForeColor, BackColor) = (BackColor, ForeColor);
         }
 
-        private void BumpTermTimer(char c)
+        private void ShowChar(char c)
         {
-            termBuf += Mon.Ascii(c);
-            if (c == 10)
-                TermTimer_Tick(null, null);
-            else
-            if (!termTimer.Enabled)
-                termTimer.Start();
-            else
-                ToggleInterval();
+            try { telnet?.WriteByte((byte)c); } catch { }
+            lock (this)
+            {
+                if (termBuf.Length == 0)
+                    displayTimer.Start();
+                termBuf += Mon.Ascii(c);
+            }
         }
 
         private void CallBack(SerialController _)
@@ -298,14 +295,13 @@ namespace Nicsure.Altair8800.Hardware
                     case 8:
                         Backspace();
                         break;
+                    case int when c == '_' && BasicBackspace:
+                        break;
                     default:
-                        if (c == '_' && BasicBackspace)
-                            break;
                         if (c == 10 && lastChar != 13)
-                            BumpTermTimer('\r');
-                        BumpTermTimer(Mon.Ascii(c));
+                            ShowChar('\r');
+                        ShowChar(Mon.Ascii(c));
                         lastChar = c;
-                        try { telnet?.WriteByte((byte)c); } catch { }
                         break;
                 }
             });

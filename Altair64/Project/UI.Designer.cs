@@ -692,12 +692,12 @@ namespace Altair64.Project
             this.CMS_Putty.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.setPuTTYexeLocationToolStripMenuItem});
             this.CMS_Putty.Name = "CMS_Putty";
-            this.CMS_Putty.Size = new System.Drawing.Size(241, 69);
+            this.CMS_Putty.Size = new System.Drawing.Size(232, 36);
             // 
             // setPuTTYexeLocationToolStripMenuItem
             // 
             this.setPuTTYexeLocationToolStripMenuItem.Name = "setPuTTYexeLocationToolStripMenuItem";
-            this.setPuTTYexeLocationToolStripMenuItem.Size = new System.Drawing.Size(240, 32);
+            this.setPuTTYexeLocationToolStripMenuItem.Size = new System.Drawing.Size(231, 32);
             this.setPuTTYexeLocationToolStripMenuItem.Text = "Set PuTTY Options";
             this.setPuTTYexeLocationToolStripMenuItem.Click += new System.EventHandler(this.PuttyMenu_Click);
             // 
