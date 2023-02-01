@@ -17,7 +17,7 @@ https://www.youtube.com/watch?v=GLT6EjQuxTs
 
 When messing with cassette audio and trying to load in audio data, I have found that setting the hysteresis to a higher value than the default tends to work better. Around 55% for me seems optimal, YMMV.
 
-The core 8080 C++ code doesn't use any Windows APIs (I think) so it should be portable to other platforms easily enough. The 8080 code is static and thus only capable of emulating a single CPU. Objectification for multiple instances is something I am planning, but frankly, I don't see much use case for that.
+The 8080 code is static and thus only capable of emulating a single CPU. Objectification for multiple instances is something I am planning, but frankly, I don't see much use case for that. It also utilises some Windows APIs for timeing and signalling so it will need some modification to port to another platform.
 
 PuTTY embedding is implemented but is very sketchy atm. Right clicking the PUTTY option in the terminal window will allow you to mess with the settings. PuTTY must be configured with a specific saved session for use with the emulator. The default name is "Altair8800" but this can be changed in the settings. The "PuTTY TitleBar Height" option in the settings is a bit of cludge. Since there's no apparent way to surpress the PuTTY window's title bar, this setting moves the top of the terminal window up by some amount in order to hide the title bar. Depending on your system's theme, DPI and scaling settings, this value may need to be tweaked.
 Recommended (and default) Settings for the PuTTY session are:
