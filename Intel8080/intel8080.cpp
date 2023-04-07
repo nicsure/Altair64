@@ -14,9 +14,9 @@
 // it's pretty close to being accurate, that doesn't rule out potential errors
 // though so be aware of that.
 
-// The emulator has a flat fixed 64k of RAM. There's currently no option to
-// override memory access but I am planning to add memory mapping features
-// at some point to allow things like ROM, unpolulated and mirrored areas.
+// The emulator has a flat fixed 64k of RAM. You can however map all or
+// part of the RAM to an external function. This allows RAM monitoring,
+// paging and all that good stuff. Check the .h file for info on doing this.
 
 #define PEEK 0x00
 #define POKE 0x01
