@@ -30,3 +30,7 @@ Terminal > Local Line Editing = Force Off
 Terminal > Keyboard > The Backspace Key = Control H
 Window > Display scrollbar = Off
 
+
+Pre built Windows binaries are available here:
+64 Bit : https://github.com/nicsure/Altair64/raw/master/Altair64(x64).zip
+32 Bit : https://github.com/nicsure/Altair64/raw/master/Altair64(x86).zip
