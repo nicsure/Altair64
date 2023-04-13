@@ -266,39 +266,39 @@ DLL bool IsRunning()
 }
 
 // read cpu flag
-bool CF() { return *F & 1; }
-bool PF() { return *F & 4; }
-bool HF() { return *F & 16; }
-bool ZF() { return *F & 64; }
-bool SF() { return *F & 128; }
+bool __stdcall CF() { return *F & 1; }
+bool __stdcall PF() { return *F & 4; }
+bool __stdcall HF() { return *F & 16; }
+bool __stdcall ZF() { return *F & 64; }
+bool __stdcall SF() { return *F & 128; }
 
 // read inverted cpu flag
-bool CFN() { return !CF(); }
-bool PFN() { return !PF(); }
-bool HFN() { return !HF(); }
-bool ZFN() { return !ZF(); }
-bool SFN() { return !SF(); }
+bool __stdcall CFN() { return !CF(); }
+bool __stdcall PFN() { return !PF(); }
+bool __stdcall HFN() { return !HF(); }
+bool __stdcall ZFN() { return !ZF(); }
+bool __stdcall SFN() { return !SF(); }
 
 // invert a flag
-void CFI() { *F ^= 1; }
-void PFI() { *F ^= 4; }
-void HFI() { *F ^= 16; }
-void ZFI() { *F ^= 64; }
-void SFI() { *F ^= 128; }
+void __stdcall CFI() { *F ^= 1; }
+void __stdcall PFI() { *F ^= 4; }
+void __stdcall HFI() { *F ^= 16; }
+void __stdcall ZFI() { *F ^= 64; }
+void __stdcall SFI() { *F ^= 128; }
 
 // set a flag to 0
-void CF0() { *F &= 254; }
-void PF0() { *F &= 251; }
-void HF0() { *F &= 239; }
-void ZF0() { *F &= 191; }
-void SF0() { *F &= 127; }
+void __stdcall CF0() { *F &= 254; }
+void __stdcall PF0() { *F &= 251; }
+void __stdcall HF0() { *F &= 239; }
+void __stdcall ZF0() { *F &= 191; }
+void __stdcall SF0() { *F &= 127; }
 
 // set a flag to 1
-void CF1() { *F |= 1; }
-void PF1() { *F |= 4; }
-void HF1() { *F |= 16; }
-void ZF1() { *F |= 64; }
-void SF1() { *F |= 128; }
+void __stdcall CF1() { *F |= 1; }
+void __stdcall PF1() { *F |= 4; }
+void __stdcall HF1() { *F |= 16; }
+void __stdcall ZF1() { *F |= 64; }
+void __stdcall SF1() { *F |= 128; }
 
 // call tables for setting flags based on a bool value (0 [first element] or 1 [second element])
 static VoidCall CFV[] = { CF0, CF1 };
