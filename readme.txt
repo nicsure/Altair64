@@ -31,6 +31,4 @@ Terminal > Keyboard > The Backspace Key = Control H
 Window > Display scrollbar = Off
 
 
-Pre built Windows binaries are available here:
-64 Bit : https://github.com/nicsure/Altair64/raw/master/Altair64(x64).zip
-32 Bit : https://github.com/nicsure/Altair64/raw/master/Altair64(x86).zip
+There is a pre-built 64-bit binary release of this project pusbished. I have not made a 32-bit release because the 8080 dll causes a false-positive in Windows Defender.
